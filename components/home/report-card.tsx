@@ -37,7 +37,7 @@ export function ReportCard({ report }: ReportCardProps) {
                 </button>
             </div>
 
-            <div className="flex min-h-[96px] flex-col px-1 pb-1 pt-3">
+            <div className="flex min-h-24 flex-col px-1 pb-1 pt-3">
                 <h3 className="line-clamp-2 text-[1.15rem] font-semibold leading-[1.15] tracking-[-0.02em] text-foreground sm:text-[1.25rem]">
                     {report.title}
                 </h3>

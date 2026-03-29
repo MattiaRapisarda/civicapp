@@ -21,6 +21,16 @@ export const ongoingReports: Report[] = [
         image:
             "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=1200&auto=format&fit=crop",
     },
+    {
+        id: 5,
+        title: "Segnaletica danneggiata",
+        location: "Via Kennedy",
+        status: "Presa in carico",
+        updatedAtLabel: "Aggiornato 3 giorni fa",
+        supports: 9,
+        image:
+            "https://images.unsplash.com/photo-1460317442991-0ec209397118?q=80&w=1200&auto=format&fit=crop",
+    },
 ]
 
 export const resolvedReports: Report[] = [
