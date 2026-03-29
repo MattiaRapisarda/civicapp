@@ -69,6 +69,74 @@ export const mockReportDetails: ReportDetail[] = [
             },
         ],
     },
+    {
+        id: "3",
+        title: "Segnaletica assente",
+        description:
+            "Sono presenti diverse buche profonde lungo la carreggiata, in particolare vicino all'incrocio. Il passaggio in scooter e bici è rischioso, soprattutto di sera.",
+        category: "Strade",
+        status: "presa_in_carico",
+        location: "Centro",
+        address: "Via Roma 24, Catania",
+        coordinates: {
+            lat: 37.5079,
+            lng: 15.083,
+        },
+        updatedAtLabel: "Aggiornata 2 giorni fa",
+        createdAtLabel: "Segnalata il 24 marzo 2026",
+        supports: 18,
+        commentsCount: 6,
+        image:
+            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+        reporter: "Mattia R.",
+
+        // 🔥 NUOVI CAMPI
+        isCreatedByCurrentUser: true,
+        isSupportedByCurrentUser: false,
+
+        updates: [
+            {
+                id: "u1",
+                title: "Segnalazione inviata",
+                description:
+                    "La segnalazione è stata pubblicata dalla cittadinanza.",
+                createdAtLabel: "24 marzo 2026 · 09:12",
+                type: "created",
+            },
+            {
+                id: "u2",
+                title: "Presa in verifica",
+                description:
+                    "La situazione è stata inoltrata agli uffici competenti.",
+                createdAtLabel: "25 marzo 2026 · 11:30",
+                type: "review",
+            },
+            {
+                id: "u3",
+                title: "Intervento programmato",
+                description:
+                    "È stato pianificato un sopralluogo tecnico sul posto.",
+                createdAtLabel: "28 marzo 2026 · 08:45",
+                type: "progress",
+            },
+        ],
+        comments: [
+            {
+                id: "c1",
+                author: "Giulia",
+                text: "Confermo, passando in bici è davvero pericoloso.",
+                createdAtLabel: "2 ore fa",
+                likes: 4,
+            },
+            {
+                id: "c2",
+                author: "Andrea",
+                text: "La sera la visibilità è bassa e si evitano con difficoltà.",
+                createdAtLabel: "5 ore fa",
+                likes: 2,
+            },
+        ],
+    },
 
     {
         id: "2",
