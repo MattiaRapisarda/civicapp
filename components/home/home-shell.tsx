@@ -4,7 +4,6 @@ import { useState } from "react"
 import { SearchBar } from "@/components/home/search-bar"
 import { TopTabs, type HomeTab } from "@/components/home/top-tabs"
 import { ReportSection } from "@/components/home/report-section"
-import { BottomNav } from "@/components/home/bottom-nav"
 import { ongoingReports, resolvedReports } from "@/data/reports"
 
 export function HomeShell() {
@@ -26,8 +25,6 @@ export function HomeShell() {
                     reports={resolvedReports}
                 />
             </div>
-
-            <BottomNav activeItem="explore" />
         </main>
     )
 }
