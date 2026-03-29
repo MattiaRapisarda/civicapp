@@ -32,7 +32,7 @@ export function BottomNav({ activeItem = "explore" }: BottomNavProps) {
                         return (
                             <button
                                 key={item.key}
-                                className="flex flex-col items-center justify-center gap-1"
+                                className="flex flex-col items-center justify-center gap-1 cursor-pointer"
                             >
                                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-md">
                                     <Icon className="h-7 w-7" />
@@ -50,7 +50,7 @@ export function BottomNav({ activeItem = "explore" }: BottomNavProps) {
                                 isActive ? "text-primary" : "text-muted-foreground"
                             )}
                         >
-                            <Icon className="h-5 w-5" />
+                            <Icon className="h-5 w-5 cursor-pointer" />
                             <span className="text-xs font-medium">{item.label}</span>
                         </button>
                     )

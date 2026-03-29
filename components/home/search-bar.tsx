@@ -20,7 +20,7 @@ interface SearchBarProps {
 }
 
 export function SearchBar({
-    placeholder = "Cerca via o problema",
+    placeholder = "Cerca via o segnalazione",
     value,
     defaultValue = "",
     onChange,
