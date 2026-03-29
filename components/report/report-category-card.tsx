@@ -40,7 +40,7 @@ export function ReportCategoryCard({
                                 type="button"
                                 onClick={() => onSelectCategory(item.value)}
                                 className={cn(
-                                    "flex min-h-[92px] flex-col items-start justify-between rounded-[24px] border px-4 py-4 text-left transition cursor-pointer",
+                                    "flex min-h-23 flex-col items-start justify-between rounded-[24px] border px-4 py-4 text-left transition cursor-pointer",
                                     isActive
                                         ? "border-foreground bg-foreground text-background"
                                         : "bg-background hover:bg-muted/40"

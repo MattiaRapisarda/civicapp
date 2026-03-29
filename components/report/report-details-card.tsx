@@ -34,7 +34,7 @@ export function ReportDetailsCard({
                     }
                     maxLength={maxLength}
                     placeholder="Descrivi brevemente il problema..."
-                    className="min-h-[120px] w-full resize-none rounded-[24px] border bg-background px-4 py-3 text-sm shadow-none outline-none"
+                    className="min-h-30 w-full resize-none rounded-[24px] border bg-background px-4 py-3 text-sm shadow-none outline-none"
                 />
 
                 <div className="mt-2 text-right text-xs text-muted-foreground">
