@@ -6,7 +6,7 @@ import { Home, Map, PlusCircle, Activity, User, Bell } from "lucide-react"
 const tabs = [
     { label: "Esplora", icon: Home, path: "/" },
     { label: "Mappa", icon: Map, path: "/map" },
-    { label: "Segnala", icon: PlusCircle, path: "/report" },
+    { label: "Segnala", icon: PlusCircle, path: "/report/new" },
     { label: "Attività", icon: Bell, path: "/activity" },
     { label: "Profilo", icon: User, path: "/profile" },
 ]
