@@ -19,7 +19,7 @@ const tabs = [
 
 export function TopTabs({ activeTab, onChange }: TopTabsProps) {
     return (
-        <div className="px-4 pt-5 sm:px-6 lg:px-8">
+        <div className="px-4 pt-5 sm:px-6 lg:px-8 ">
             <div className="mx-auto grid max-w-5xl grid-cols-3 gap-2 sm:gap-4">
                 {tabs.map((tab) => {
                     const Icon = tab.icon
@@ -35,7 +35,7 @@ export function TopTabs({ activeTab, onChange }: TopTabsProps) {
                                 isActive ? "text-foreground" : "text-muted-foreground"
                             )}
                         >
-                            <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                            <Icon className="h-5 w-5 sm:h-6 sm:w-6 cursor-pointer" />
                             <div className="flex items-center gap-1">
                                 <span className="text-xs font-medium sm:text-sm">
                                     {tab.label}
