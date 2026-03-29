@@ -1,7 +1,6 @@
 "use client"
 
-import { Bell, CheckCircle2, MapPin } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { Activity, CheckCircle2, MapPin } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export type HomeTab = "nearby" | "ongoing" | "resolved"
@@ -13,13 +12,13 @@ interface TopTabsProps {
 
 const tabs = [
     { key: "nearby" as const, label: "Vicino a te", icon: MapPin },
-    { key: "ongoing" as const, label: "In corso", icon: Bell },
+    { key: "ongoing" as const, label: "In corso", icon: Activity },
     { key: "resolved" as const, label: "Concluse", icon: CheckCircle2 },
 ]
 
 export function TopTabs({ activeTab, onChange }: TopTabsProps) {
     return (
-        <div className="px-4 pt-5 sm:px-6 lg:px-8 ">
+        <div className="px-4 pt-5 sm:px-6 lg:px-8">
             <div className="mx-auto grid max-w-5xl grid-cols-3 gap-2 sm:gap-4">
                 {tabs.map((tab) => {
                     const Icon = tab.icon
@@ -35,17 +34,18 @@ export function TopTabs({ activeTab, onChange }: TopTabsProps) {
                                 isActive ? "text-foreground" : "text-muted-foreground"
                             )}
                         >
-                            <Icon className="h-5 w-5 sm:h-6 sm:w-6 cursor-pointer" />
-                            <div className="flex items-center gap-1">
-                                <span className="text-xs font-medium sm:text-sm">
-                                    {tab.label}
-                                </span>
+                            <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
 
-                            </div>
+                            <span className="text-xs font-medium sm:text-sm">
+                                {tab.label}
+                            </span>
+
                             <div
                                 className={cn(
                                     "h-1 rounded-full transition-all",
-                                    isActive ? "w-14 bg-foreground sm:w-16" : "w-0 bg-transparent"
+                                    isActive
+                                        ? "w-14 bg-foreground sm:w-16"
+                                        : "w-0 bg-transparent"
                                 )}
                             />
                         </button>
