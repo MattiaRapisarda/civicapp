@@ -1,12 +1,10 @@
-import type { ReportStatus } from "@/components/home/status-badge"
-
 export type ActivityTab = "created" | "supported"
 
-export interface ActivityReport {
-    id: number
+export type ActivityReport = {
+    id: string
     title: string
     location: string
-    status: ReportStatus
+    status: "in_verifica" | "presa_in_carico" | "conclusa"
     updatedAtLabel: string
     supports: number
 }

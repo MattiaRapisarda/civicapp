@@ -4,7 +4,7 @@ import { useState } from "react"
 import { SearchBar } from "@/components/home/search-bar"
 import { TopTabs, type HomeTab } from "@/components/home/top-tabs"
 import { ReportSection } from "@/components/home/report-section"
-import { ongoingReports, resolvedReports } from "@/data/reports"
+import { ongoingReports, resolvedReports } from "@/components/home/home-mock-data"
 
 export function HomeShell() {
     const [activeTab, setActiveTab] = useState<HomeTab>("nearby")

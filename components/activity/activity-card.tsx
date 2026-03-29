@@ -1,13 +1,15 @@
+"use client"
+
+import Link from "next/link"
 import { Clock3, Heart, MapPin } from "lucide-react"
 import { StatusBadge } from "@/components/home/status-badge"
 import type { ActivityReport } from "@/components/activity/activity-types"
 
 interface ActivityCardProps {
     report: ActivityReport
-    onOpen?: (id: number) => void
 }
 
-export function ActivityCard({ report, onOpen }: ActivityCardProps) {
+export function ActivityCard({ report }: ActivityCardProps) {
     return (
         <article className="rounded-[28px] border bg-background p-5 shadow-sm">
             <div className="flex items-start justify-between gap-4">
@@ -38,13 +40,12 @@ export function ActivityCard({ report, onOpen }: ActivityCardProps) {
             </div>
 
             <div className="mt-4">
-                <button
-                    type="button"
-                    onClick={() => onOpen?.(report.id)}
-                    className="text-sm font-medium text-foreground cursor-pointer underline-offset-4 hover:underline"
+                <Link
+                    href={`/report/${report.id}`}
+                    className="cursor-pointer text-sm font-medium text-foreground underline-offset-4 hover:underline"
                 >
                     Vedi dettaglio
-                </button>
+                </Link>
             </div>
         </article>
     )
