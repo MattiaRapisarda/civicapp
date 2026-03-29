@@ -25,7 +25,7 @@ export const ongoingReports: Report[] = [
         id: 5,
         title: "Segnaletica danneggiata",
         location: "Via Kennedy",
-        status: "Presa in carico",
+        status: "presa_in_carico",
         updatedAtLabel: "Aggiornato 3 giorni fa",
         supports: 9,
         image:
