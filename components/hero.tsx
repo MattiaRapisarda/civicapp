@@ -55,9 +55,9 @@ export function HeroSection() {
                     <div className="relative">
                         <Card className="overflow-hidden rounded-3xl border shadow-sm">
                             <CardContent className="p-0">
-                                <div className="relative h-[420px] bg-muted/40">
+                                <div className="relative h-105 bg-muted/40">
                                     <div className="absolute inset-0">
-                                        <div className="h-full w-full bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.04)_1px,_transparent_1px)] [background-size:24px_24px]" />
+                                        <div className="h-full w-full bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.04)_1px,transparent_1px)] bg-size-[24px_24px]" />
                                     </div>
 
                                     <div className="absolute left-[18%] top-[22%]">
