@@ -90,7 +90,7 @@ export function SearchBar({
                 <div className="absolute right-6 mt-2 w-48 rounded-xl border bg-background shadow-md">
                     <button
                         onClick={() => handleFilterSelect("in_corso")}
-                        className={`block w-full px-4 py-2 text-left text-sm hover:bg-muted ${selectedFilter === "in_corso" ? "font-semibold" : ""
+                        className={`block w-full px-4 py-2 text-left text-sm hover:bg-muted cursor-pointer ${selectedFilter === "in_corso" ? "font-semibold" : ""
                             }`}
                     >
                         In corso
@@ -98,7 +98,7 @@ export function SearchBar({
 
                     <button
                         onClick={() => handleFilterSelect("concluse")}
-                        className={`block w-full px-4 py-2 text-left text-sm hover:bg-muted ${selectedFilter === "concluse" ? "font-semibold" : ""
+                        className={`block w-full px-4 py-2 text-left text-sm hover:bg-muted cursor-pointer ${selectedFilter === "concluse" ? "font-semibold" : ""
                             }`}
                     >
                         Concluse

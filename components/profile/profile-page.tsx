@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 
-import { PageHeader } from "@/components/shared/page-header"
 import { ProfileHeader } from "@/components/profile/profile-header"
 import { AccountSection } from "@/components/profile/account-section"
 import { ActivityTabs } from "@/components/profile/activity-tabs"
@@ -57,10 +56,6 @@ export function ProfilePage() {
 
     return (
         <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-2 sm:px-6 lg:px-8">
-
-            {/* 🔝 Header pagina */}
-            <PageHeader title="Profilo" showBack={false} />
-
             <div className="space-y-6">
 
                 {/* 👤 Header utente */}

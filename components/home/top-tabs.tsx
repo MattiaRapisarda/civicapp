@@ -34,7 +34,7 @@ export function TopTabs({ activeTab, onChange }: TopTabsProps) {
                                 isActive ? "text-foreground" : "text-muted-foreground"
                             )}
                         >
-                            <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                            <Icon className="h-5 w-5 sm:h-6 sm:w-6 cursor-pointer" />
 
                             <span className="text-xs font-medium sm:text-sm">
                                 {tab.label}
