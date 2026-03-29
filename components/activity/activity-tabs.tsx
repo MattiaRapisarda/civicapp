@@ -1,4 +1,4 @@
-import type { ActivityTab } from "@/components/profile/profile-types"
+import type { ActivityTab } from "@/components/activity/activity-types"
 
 interface ActivityTabsProps {
     activeTab: ActivityTab
