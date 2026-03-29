@@ -9,13 +9,17 @@ import {
     TreePine,
 } from "lucide-react"
 
+import { ReportFlowTopbar } from "@/components/report/report-flow-topbar"
 import { ReportFlowHeader } from "@/components/report/report-flow-header"
 import { ReportPhotoCard } from "@/components/report/report-photo-card"
 import { ReportLocationCard } from "@/components/report/report-location-card"
 import { ReportCategoryCard } from "@/components/report/report-category-card"
 import { ReportDetailsCard } from "@/components/report/report-details-card"
 import { ReportSubmitBar } from "@/components/report/report-submit-bar"
-import type { ReportCategoryItem, ReportCategory } from "@/components/report/report-types"
+import type {
+    ReportCategory,
+    ReportCategoryItem,
+} from "@/components/report/report-types"
 
 const categories: ReportCategoryItem[] = [
     { value: "road", label: "Buche e strada", icon: Construction },
@@ -54,7 +58,7 @@ export function NewReportFlow() {
         try {
             setIsSubmitting(true)
 
-            // TODO: collega action/API reale
+            // TODO: collega qui action o API reale
             await new Promise((resolve) => setTimeout(resolve, 1000))
 
             console.log({
@@ -69,44 +73,48 @@ export function NewReportFlow() {
     }
 
     return (
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pb-28 pt-4 sm:px-6 lg:px-8">
-            <ReportFlowHeader
-                title="Nuova segnalazione"
-                description="Aggiungi una foto, indica il punto e descrivi il problema."
-            />
+        <>
+            <ReportFlowTopbar />
 
-            <ReportPhotoCard
-                imagePreview={imagePreview}
-                onImageChange={handleImageChange}
-                onRemoveImage={handleRemoveImage}
-            />
+            <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pb-40 pt-4 sm:px-6 lg:px-8">
+                <ReportFlowHeader
+                    title="Nuova segnalazione"
+                    description="Aggiungi una foto, indica il punto e descrivi il problema."
+                />
 
-            <ReportLocationCard
-                address={address}
-                onAddressChange={setAddress}
-                onUseCurrentLocation={() => {
-                    // TODO: geolocalizzazione reale
-                    console.log("use current location")
-                }}
-            />
+                <ReportPhotoCard
+                    imagePreview={imagePreview}
+                    onImageChange={handleImageChange}
+                    onRemoveImage={handleRemoveImage}
+                />
 
-            <ReportCategoryCard
-                categories={categories}
-                selectedCategory={category}
-                onSelectCategory={setCategory}
-            />
+                <ReportLocationCard
+                    address={address}
+                    onAddressChange={setAddress}
+                    onUseCurrentLocation={() => {
+                        // TODO: collega qui la geolocalizzazione reale
+                        console.log("use current location")
+                    }}
+                />
 
-            <ReportDetailsCard
-                description={description}
-                onDescriptionChange={setDescription}
-                maxLength={240}
-            />
+                <ReportCategoryCard
+                    categories={categories}
+                    selectedCategory={category}
+                    onSelectCategory={setCategory}
+                />
+
+                <ReportDetailsCard
+                    description={description}
+                    onDescriptionChange={setDescription}
+                    maxLength={240}
+                />
+            </div>
 
             <ReportSubmitBar
                 isDisabled={!isValid || isSubmitting}
                 isSubmitting={isSubmitting}
                 onSubmit={handleSubmit}
             />
-        </div>
+        </>
     )
 }
