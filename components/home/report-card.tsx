@@ -18,8 +18,8 @@ interface ReportCardProps {
 
 export function ReportCard({ report }: ReportCardProps) {
     return (
-        <Card className="overflow-hidden rounded-[28px] border-0 shadow-none">
-            <CardContent className="p-0">
+        <Card className="h-full overflow-hidden rounded-[28px] border-0 shadow-none">
+            <CardContent className="flex h-full flex-col p-0">
                 <div className="relative">
                     <img
                         src={report.image}
@@ -39,23 +39,29 @@ export function ReportCard({ report }: ReportCardProps) {
                     </button>
                 </div>
 
-                <div className="px-2 pb-1 pt-4">
-                    <p className="text-xl font-semibold leading-tight tracking-tight sm:text-2xl lg:text-[28px]">
-                        {report.title}
-                    </p>
+                <div className="flex flex-1 flex-col px-4 pb-4 pt-4">
+                    <div className="min-h-[5.5rem]">
+                        <h3 className="line-clamp-2 text-xl font-semibold leading-tight tracking-tight sm:text-2xl lg:text-[28px]">
+                            {report.title}
+                        </h3>
+                    </div>
 
-                    <p className="mt-2 text-sm text-foreground sm:text-base">
-                        {report.location}
-                    </p>
+                    <div className="mt-2 min-h-[1.75rem]">
+                        <p className="text-sm text-foreground sm:text-base">
+                            {report.location}
+                        </p>
+                    </div>
 
-                    <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock3 className="h-4 w-4" />
+                    <div className="mt-1 min-h-[1.5rem] flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock3 className="h-4 w-4 shrink-0" />
                         <span>{report.updatedAtLabel}</span>
                     </div>
 
-                    <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-                        {report.supports} supporti · stato pubblico
-                    </p>
+                    <div className="mt-auto pt-3 min-h-[1.75rem]">
+                        <p className="text-sm text-muted-foreground sm:text-base">
+                            {report.supports} supporti · stato pubblico
+                        </p>
+                    </div>
                 </div>
             </CardContent>
         </Card>
