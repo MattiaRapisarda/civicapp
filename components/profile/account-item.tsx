@@ -13,7 +13,7 @@ export function AccountItem({ item, onClick }: AccountItemProps) {
         <button
             type="button"
             onClick={() => onClick?.(item.id)}
-            className={`flex w-full items-center justify-between rounded-2xl px-4 py-4 text-left transition ${item.danger ? "hover:bg-red-50" : "hover:bg-muted/50"
+            className={`flex w-full items-center justify-between cursor-pointer rounded-2xl px-4 py-4 text-left transition ${item.danger ? "hover:bg-red-50" : "hover:bg-muted/50"
                 }`}
         >
             <div className="flex items-center gap-4">

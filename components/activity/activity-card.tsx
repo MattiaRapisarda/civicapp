@@ -41,7 +41,7 @@ export function ActivityCard({ report, onOpen }: ActivityCardProps) {
                 <button
                     type="button"
                     onClick={() => onOpen?.(report.id)}
-                    className="text-sm font-medium text-foreground underline-offset-4 hover:underline"
+                    className="text-sm font-medium text-foreground cursor-pointer underline-offset-4 hover:underline"
                 >
                     Vedi dettaglio
                 </button>
