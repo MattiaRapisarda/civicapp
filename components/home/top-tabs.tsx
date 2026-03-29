@@ -13,7 +13,7 @@ interface TopTabsProps {
 
 const tabs = [
     { key: "nearby" as const, label: "Vicino a te", icon: MapPin },
-    { key: "ongoing" as const, label: "In corso", icon: Bell, badge: "Live" },
+    { key: "ongoing" as const, label: "In corso", icon: Bell },
     { key: "resolved" as const, label: "Concluse", icon: CheckCircle2 },
 ]
 
@@ -40,11 +40,7 @@ export function TopTabs({ activeTab, onChange }: TopTabsProps) {
                                 <span className="text-xs font-medium sm:text-sm">
                                     {tab.label}
                                 </span>
-                                {tab.badge ? (
-                                    <Badge className="rounded-full px-2 py-0 text-[10px]">
-                                        {tab.badge}
-                                    </Badge>
-                                ) : null}
+
                             </div>
                             <div
                                 className={cn(
