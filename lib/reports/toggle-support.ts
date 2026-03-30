@@ -8,15 +8,21 @@ export async function toggleSupport(reportId: string): Promise<void> {
 
     const {
         data: { user },
+        error: userError,
     } = await supabase.auth.getUser()
 
-    if (!user) {
+    if (userError || !user) {
         throw new Error("Utente non autenticato")
     }
 
+    if (!reportId) {
+        throw new Error("Segnalazione non valida")
+    }
+
+    // 🔍 Controllo esistenza supporto
     const { data: existingSupport, error: existingSupportError } = await supabase
         .from("report_supports")
-        .select("id")
+        .select("report_id")
         .eq("report_id", reportId)
         .eq("user_id", user.id)
         .maybeSingle()
@@ -25,16 +31,20 @@ export async function toggleSupport(reportId: string): Promise<void> {
         throw new Error(existingSupportError.message)
     }
 
+    // ❌ Se esiste → rimuovi
     if (existingSupport) {
         const { error: deleteError } = await supabase
             .from("report_supports")
             .delete()
-            .eq("id", existingSupport.id)
+            .eq("report_id", reportId)
+            .eq("user_id", user.id)
 
         if (deleteError) {
             throw new Error(deleteError.message)
         }
-    } else {
+    }
+    // ➕ Se NON esiste → aggiungi
+    else {
         const { error: insertError } = await supabase
             .from("report_supports")
             .insert({
@@ -47,7 +57,8 @@ export async function toggleSupport(reportId: string): Promise<void> {
         }
     }
 
+    // 🔄 Revalidate
     revalidatePath("/")
+    revalidatePath("/activity")
     revalidatePath(`/report/${reportId}`)
-    revalidatePath(`/reports/${reportId}`)
 }

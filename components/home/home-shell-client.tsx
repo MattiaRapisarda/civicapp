@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { SearchBar } from "@/components/home/search-bar"
 import { TopTabs, type HomeTab } from "@/components/home/top-tabs"
 import { ReportSection } from "@/components/home/report-section"
 import type { Report } from "@/components/home/report-card"
+
+type FilterStatus = "in_corso" | "concluse" | null
 
 interface HomeShellClientProps {
     ongoingReports: Report[]
@@ -16,22 +18,73 @@ export function HomeShellClient({
     resolvedReports,
 }: HomeShellClientProps) {
     const [activeTab, setActiveTab] = useState<HomeTab>("nearby")
+    const [searchQuery, setSearchQuery] = useState("")
+    const [selectedFilter, setSelectedFilter] = useState<FilterStatus>(null)
+
+    const normalizedQuery = searchQuery.trim().toLowerCase()
+
+    const filteredOngoingReports = useMemo(() => {
+        return ongoingReports.filter((report) => {
+            const matchesQuery =
+                !normalizedQuery ||
+                report.title.toLowerCase().includes(normalizedQuery) ||
+                report.location.toLowerCase().includes(normalizedQuery)
+
+            const matchesFilter =
+                selectedFilter === null || selectedFilter === "in_corso"
+
+            return matchesQuery && matchesFilter
+        })
+    }, [ongoingReports, normalizedQuery, selectedFilter])
+
+    const filteredResolvedReports = useMemo(() => {
+        return resolvedReports.filter((report) => {
+            const matchesQuery =
+                !normalizedQuery ||
+                report.title.toLowerCase().includes(normalizedQuery) ||
+                report.location.toLowerCase().includes(normalizedQuery)
+
+            const matchesFilter =
+                selectedFilter === null || selectedFilter === "concluse"
+
+            return matchesQuery && matchesFilter
+        })
+    }, [resolvedReports, normalizedQuery, selectedFilter])
+
+    const hasNoResults =
+        filteredOngoingReports.length === 0 &&
+        filteredResolvedReports.length === 0
 
     return (
         <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-2 sm:px-6 lg:px-8">
+            <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onSearch={setSearchQuery}
+                onFilterChange={setSelectedFilter}
+            />
 
-            <SearchBar />
             <TopTabs activeTab={activeTab} onChange={setActiveTab} />
 
-            <ReportSection
-                title="Segnalazioni in corso"
-                reports={ongoingReports}
-            />
+            {hasNoResults ? (
+                <div className="mt-6 rounded-[24px] border bg-card p-6 text-sm text-muted-foreground shadow-sm">
+                    Nessuna segnalazione trovata.
+                </div>
+            ) : null}
 
-            <ReportSection
-                title="Segnalazioni concluse"
-                reports={resolvedReports}
-            />
+            {(selectedFilter === null || selectedFilter === "in_corso") && (
+                <ReportSection
+                    title="Segnalazioni in corso"
+                    reports={filteredOngoingReports}
+                />
+            )}
+
+            {(selectedFilter === null || selectedFilter === "concluse") && (
+                <ReportSection
+                    title="Segnalazioni concluse"
+                    reports={filteredResolvedReports}
+                />
+            )}
         </main>
     )
 }

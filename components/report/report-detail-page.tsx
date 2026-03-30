@@ -92,10 +92,23 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
 
         startCommentTransition(async () => {
             try {
-                const formData = new FormData()
-                formData.append("comment", comment)
+                const trimmedComment = comment.trim()
 
-                await createComment(report.id, formData)
+                if (!trimmedComment) {
+                    setCommentError("Il commento non può essere vuoto.")
+                    return
+                }
+
+                const formData = new FormData()
+                formData.append("comment", trimmedComment)
+
+                const result = await createComment(report.id, formData)
+
+                if (!result.success) {
+                    setCommentError(result.error)
+                    return
+                }
+
                 setComment("")
                 router.refresh()
             } catch (error) {
