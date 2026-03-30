@@ -5,7 +5,7 @@ export type ReportDetailData = {
     title: string
     description: string
     category: string
-    status: "in_verifica" | "presa_in_carico" | "conclusa"
+    status: "in_verifica" | "presa_in_carico" | "risolta"
     location: string
     address: string
     coordinates: {

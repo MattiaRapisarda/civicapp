@@ -38,7 +38,7 @@ export const resolvedReports: Report[] = [
         id: "3",
         title: "Rifiuti rimossi dall’area verde",
         location: "Villa Comunale",
-        status: "conclusa",
+        status: "risolta",
         updatedAtLabel: "Chiusa ieri",
         supports: 12,
         image:
@@ -48,7 +48,7 @@ export const resolvedReports: Report[] = [
         id: "4",
         title: "Segnaletica ripristinata",
         location: "Via Kennedy",
-        status: "conclusa",
+        status: "risolta",
         updatedAtLabel: "Chiusa 3 giorni fa",
         supports: 9,
         image:

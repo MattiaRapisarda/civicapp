@@ -197,7 +197,7 @@ export const mockReportDetails: ReportDetail[] = [
         description:
             "Il lampione davanti al civico 18 non si accende da diversi giorni, rendendo la zona poco illuminata durante la notte.",
         category: "Illuminazione",
-        status: "conclusa",
+        status: "risolta",
         location: "Centro",
         address: "Via Garibaldi 18, Catania",
         coordinates: {
