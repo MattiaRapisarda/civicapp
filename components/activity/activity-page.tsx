@@ -40,10 +40,23 @@ export function ActivityPage({
         return activeTab === "created" ? createdReports : supportedReports
     }, [activeTab, createdReports, supportedReports])
 
+    const profileUser = useMemo(() => {
+        return {
+            ...userProfile,
+            stats: {
+                createdCount: createdReports.length,
+                supportedCount: supportedReports.length,
+                resolvedCount: createdReports.filter(
+                    (report) => report.status === "risolta"
+                ).length,
+            },
+        }
+    }, [userProfile, createdReports, supportedReports])
+
     return (
         <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-2 sm:px-6 lg:px-8">
             <div className="space-y-6">
-                <ProfileHeader user={userProfile} />
+                <ProfileHeader user={profileUser} />
             </div>
 
             <div className="mt-6">
@@ -61,7 +74,6 @@ export function ActivityPage({
                     ))
                 )}
             </div>
-
 
             <BottomNav />
         </main>

@@ -35,7 +35,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                             type="email"
                             required
                             className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
-                            placeholder="mattia@email.com"
+                            placeholder="tuoindirizzo@email.com"
                         />
                     </div>
 
