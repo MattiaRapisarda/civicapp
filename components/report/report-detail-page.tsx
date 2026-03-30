@@ -209,7 +209,7 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                         onClick={handleToggleSupport}
                                         disabled={isSupportPending}
                                         className={cn(
-                                            "h-12 w-full rounded-full text-sm font-medium",
+                                            "h-12 w-full cursor-pointer rounded-full text-sm font-medium",
                                             report.isSupportedByCurrentUser &&
                                             "bg-foreground text-background hover:bg-foreground/90"
                                         )}
@@ -234,7 +234,7 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
 
                                 <Button
                                     variant="outline"
-                                    className="h-12 rounded-full border-border text-sm font-medium"
+                                    className="h-12 cursor-pointer rounded-full border-border text-sm font-medium"
                                     onClick={() =>
                                         document
                                             .getElementById("comment")
@@ -261,7 +261,7 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                     </p>
                                 </div>
 
-                                <Button variant="ghost" size="sm" className="rounded-full">
+                                <Button variant="ghost" size="sm" className="cursor-pointer rounded-full">
                                     Apri mappa
                                 </Button>
                             </div>
@@ -278,11 +278,6 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                             Lat {report.coordinates.lat} · Lng {report.coordinates.lng}
                                         </p>
                                     </div>
-
-                                    <p className="max-w-md text-sm text-muted-foreground">
-                                        Placeholder mappa: qui potrai collegare Leaflet, Mapbox o
-                                        Google Maps mantenendo questo stesso contenitore.
-                                    </p>
                                 </div>
                             </div>
                         </CardContent>
@@ -376,7 +371,7 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                     <Button
                                         onClick={handleSubmitComment}
                                         disabled={isCommentPending || comment.trim().length === 0}
-                                        className="rounded-full"
+                                        className="rounded-full cursor-pointer"
                                     >
                                         {isCommentPending
                                             ? "Pubblicazione..."
@@ -439,14 +434,38 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                 </div>
                             </div>
 
-                            <div className="grid gap-3 sm:grid-cols-2">
-                                <Button variant="outline" className="h-12 rounded-full">
-                                    Segui aggiornamenti
+                            <div className="space-y-2">
+                                <Button
+                                    onClick={handleToggleSupport}
+                                    disabled={isSupportPending}
+                                    className={cn(
+                                        "h-12 w-full cursor-pointer rounded-full text-sm font-medium",
+                                        report.isSupportedByCurrentUser &&
+                                        "bg-foreground text-background hover:bg-foreground/90"
+                                    )}
+                                >
+                                    <Heart
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            report.isSupportedByCurrentUser && "fill-current"
+                                        )}
+                                    />
+                                    {isSupportPending
+                                        ? "Aggiornamento..."
+                                        : report.isSupportedByCurrentUser
+                                            ? "Rimuovi supporto"
+                                            : "Supporta segnalazione"}
                                 </Button>
+
+                                {supportError ? (
+                                    <p className="text-sm text-destructive">{supportError}</p>
+                                ) : null}
+                            </div>
+                            <div>
 
                                 <Button
                                     variant="ghost"
-                                    className="h-12 rounded-full text-destructive hover:text-destructive"
+                                    className="h-12 rounded-full cursor-pointer text-destructive hover:text-destructive"
                                 >
                                     <ShieldAlert className="mr-2 h-4 w-4" />
                                     Segnala abuso

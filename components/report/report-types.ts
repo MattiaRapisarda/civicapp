@@ -1,9 +1,9 @@
 export type ReportCategory =
-    | "road"
-    | "lighting"
-    | "waste"
-    | "green"
-    | "other"
+    | "Buche e strada"
+    | "Illuminazione"
+    | "Rifiuti"
+    | "Verde pubblico"
+    | "Altro"
 
 export type ReportCategoryItem = {
     value: ReportCategory

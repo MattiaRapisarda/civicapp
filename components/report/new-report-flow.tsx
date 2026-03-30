@@ -24,11 +24,11 @@ import type {
 } from "@/components/report/report-types"
 
 const categories: ReportCategoryItem[] = [
-    { value: "road", label: "Buche e strada", icon: Construction },
-    { value: "lighting", label: "Illuminazione", icon: Lightbulb },
-    { value: "waste", label: "Rifiuti", icon: Trash2 },
-    { value: "green", label: "Verde pubblico", icon: TreePine },
-    { value: "other", label: "Altro", icon: AlertCircle },
+    { value: "Buche e strada", label: "Buche e strada", icon: Construction },
+    { value: "Illuminazione", label: "Illuminazione", icon: Lightbulb },
+    { value: "Rifiuti", label: "Rifiuti", icon: Trash2 },
+    { value: "Verde pubblico", label: "Verde pubblico", icon: TreePine },
+    { value: "Altro", label: "Altro", icon: AlertCircle },
 ]
 
 export function NewReportFlow() {
