@@ -34,6 +34,7 @@ const categories: ReportCategoryItem[] = [
 export function NewReportFlow() {
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [imageFile, setImageFile] = useState<File | null>(null)
+    const [title, setTitle] = useState("")
     const [address, setAddress] = useState("")
     const [category, setCategory] = useState<ReportCategory | null>(null)
     const [description, setDescription] = useState("")
@@ -42,8 +43,14 @@ export function NewReportFlow() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
     const isValid = useMemo(() => {
-        return Boolean(imageFile && address.trim() && category && description.trim())
-    }, [imageFile, address, category, description])
+        return Boolean(
+            imageFile &&
+            title.trim() &&
+            address.trim() &&
+            category &&
+            description.trim()
+        )
+    }, [imageFile, title, address, category, description])
 
     function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0]
@@ -81,6 +88,7 @@ export function NewReportFlow() {
 
             const formData = new FormData()
             formData.append("image", imageFile)
+            formData.append("title", title.trim())
             formData.append("address", address.trim())
             formData.append("category", category)
             formData.append("description", description.trim())
@@ -98,6 +106,7 @@ export function NewReportFlow() {
 
             setImagePreview(null)
             setImageFile(null)
+            setTitle("")
             setAddress("")
             setCategory(null)
             setDescription("")
@@ -141,6 +150,8 @@ export function NewReportFlow() {
                 />
 
                 <ReportDetailsCard
+                    title={title}
+                    onTitleChange={setTitle}
                     description={description}
                     onDescriptionChange={setDescription}
                     maxLength={240}

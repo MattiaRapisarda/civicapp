@@ -8,21 +8,9 @@ type CreateReportResult =
     | { success: true; reportId: string }
     | { success: false; error: string }
 
-function buildReportTitle(description: string) {
-    const trimmed = description.trim()
-
-    if (!trimmed) {
-        return "Nuova segnalazione"
-    }
-
-    if (trimmed.length <= 60) {
-        return trimmed
-    }
-
-    return `${trimmed.slice(0, 57)}...`
-}
-
-export async function createReport(formData: FormData): Promise<CreateReportResult> {
+export async function createReport(
+    formData: FormData
+): Promise<CreateReportResult> {
     try {
         const supabase = await createSupabaseServerClient()
 
@@ -39,6 +27,7 @@ export async function createReport(formData: FormData): Promise<CreateReportResu
         }
 
         const image = formData.get("image")
+        const title = formData.get("title")?.toString().trim() ?? ""
         const address = formData.get("address")?.toString().trim() ?? ""
         const category = formData.get("category")?.toString().trim() ?? ""
         const description = formData.get("description")?.toString().trim() ?? ""
@@ -47,6 +36,13 @@ export async function createReport(formData: FormData): Promise<CreateReportResu
             return {
                 success: false,
                 error: "Immagine non valida.",
+            }
+        }
+
+        if (!title) {
+            return {
+                success: false,
+                error: "Inserisci un titolo.",
             }
         }
 
@@ -70,8 +66,6 @@ export async function createReport(formData: FormData): Promise<CreateReportResu
                 error: "Inserisci una descrizione.",
             }
         }
-
-        const title = buildReportTitle(description)
 
         const { data: createdReport, error: reportInsertError } = await supabase
             .from("reports")
@@ -118,9 +112,7 @@ export async function createReport(formData: FormData): Promise<CreateReportResu
 
             return {
                 success: false,
-                error:
-                    uploadError.message ??
-                    "Upload immagine non riuscito.",
+                error: uploadError.message ?? "Upload immagine non riuscito.",
             }
         }
 

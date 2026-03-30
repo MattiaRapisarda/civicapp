@@ -1,44 +1,58 @@
-import { FileText } from "lucide-react"
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 interface ReportDetailsCardProps {
+    title: string
+    onTitleChange: (value: string) => void
     description: string
     onDescriptionChange: (value: string) => void
-    maxLength?: number
+    maxLength: number
 }
 
 export function ReportDetailsCard({
+    title,
+    onTitleChange,
     description,
     onDescriptionChange,
-    maxLength = 240,
+    maxLength,
 }: ReportDetailsCardProps) {
     return (
-        <Card className="rounded-[28px] border shadow-sm">
-            <CardContent className="p-4 sm:p-5">
-                <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-muted">
-                        <FileText className="h-5 w-5 text-foreground/80" />
-                    </div>
-                    <div>
-                        <h2 className="text-base font-semibold">Dettagli</h2>
-                        <p className="text-sm text-muted-foreground">
-                            Aggiungi una breve descrizione
-                        </p>
-                    </div>
+        <Card className="rounded-[28px] border bg-card shadow-sm">
+            <CardContent className="space-y-4 p-5">
+                <div className="space-y-2">
+                    <h2 className="text-base font-semibold">Dettagli</h2>
+                    <p className="text-sm text-muted-foreground">
+                        Inserisci un titolo breve e una descrizione chiara del problema.
+                    </p>
                 </div>
 
-                <textarea
-                    value={description}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                        onDescriptionChange(e.target.value)
-                    }
-                    maxLength={maxLength}
-                    placeholder="Descrivi brevemente il problema..."
-                    className="min-h-30 w-full resize-none rounded-[24px] border bg-background px-4 py-3 text-sm shadow-none outline-none"
-                />
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">Titolo</label>
+                    <Input
+                        value={title}
+                        onChange={(event) => onTitleChange(event.target.value)}
+                        placeholder="Es. Lampione spento in via Roma"
+                        maxLength={80}
+                    />
+                </div>
 
-                <div className="mt-2 text-right text-xs text-muted-foreground">
-                    {description.length}/{maxLength}
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">Descrizione</label>
+                    <Textarea
+                        value={description}
+                        onChange={(event) =>
+                            onDescriptionChange(event.target.value)
+                        }
+                        placeholder="Descrivi il problema..."
+                        maxLength={maxLength}
+                        className="min-h-[120px]"
+                    />
+                    <p className="text-right text-xs text-muted-foreground">
+                        {description.length}/{maxLength}
+                    </p>
                 </div>
             </CardContent>
         </Card>
