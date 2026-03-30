@@ -110,7 +110,51 @@ export async function getActivityPageData(): Promise<{
         })
     )
 
-    const supportedReports: ActivityReport[] = []
+    const supportsQuery = await supabase
+        .from("report_supports")
+        .select("report_id")
+        .eq("user_id", user.id)
+
+    if (supportsQuery.error) {
+        console.error(
+            "Errore fetch supporti utente:",
+            supportsQuery.error
+        )
+    }
+
+    const supportedReportIds = [
+        ...new Set((supportsQuery.data ?? []).map((item) => item.report_id)),
+    ]
+
+    let supportedReports: ActivityReport[] = []
+
+    if (supportedReportIds.length > 0) {
+        const supportedReportsQuery = await supabase
+            .from("reports")
+            .select("*")
+            .in("id", supportedReportIds)
+            .order("updated_at", { ascending: false })
+
+        if (supportedReportsQuery.error) {
+            console.error(
+                "Errore fetch segnalazioni supportate:",
+                supportedReportsQuery.error
+            )
+        } else {
+            supportedReports = (supportedReportsQuery.data ?? []).map((report) =>
+                mapReport({
+                    id: report.id,
+                    title: report.title,
+                    location: report.location,
+                    status: report.status,
+                    created_at: report.created_at,
+                    updated_at: report.updated_at,
+                    image_url: report.image_url,
+                    supports_count: report.supports_count,
+                })
+            )
+        }
+    }
 
     const resolvedCount = createdReports.filter(
         (report) => report.status === "risolta"
