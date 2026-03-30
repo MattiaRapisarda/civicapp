@@ -6,8 +6,8 @@ export async function HomeShell() {
     const reports = await getReports()
     const mapped = reports.map(mapReportToCard)
 
-    const ongoing = mapped.filter((report) => report.status !== "conclusa")
-    const resolved = mapped.filter((report) => report.status === "conclusa")
+    const ongoing = mapped.filter((report) => report.status !== "risolta")
+    const resolved = mapped.filter((report) => report.status === "risolta")
 
     return (
         <HomeShellClient

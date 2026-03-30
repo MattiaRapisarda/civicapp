@@ -1,7 +1,7 @@
 export type ReportStatus =
     | "in_verifica"
     | "presa_in_carico"
-    | "conclusa"
+    | "risolta"
 
 export type ReportCategory =
     | "illuminazione"

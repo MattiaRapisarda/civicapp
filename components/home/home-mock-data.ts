@@ -15,9 +15,9 @@ function mapReportDetailToHomeReport(report: ReportDetail): Report {
 }
 
 export const ongoingReports: Report[] = mockReportDetails
-    .filter((report) => report.status !== "conclusa")
+    .filter((report) => report.status !== "risolta")
     .map(mapReportDetailToHomeReport)
 
 export const resolvedReports: Report[] = mockReportDetails
-    .filter((report) => report.status === "conclusa")
+    .filter((report) => report.status === "risolta")
     .map(mapReportDetailToHomeReport)

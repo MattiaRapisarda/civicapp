@@ -6,7 +6,7 @@ export function getStatusLabel(status: ReportStatus): string {
             return "In verifica"
         case "presa_in_carico":
             return "Presa in carico"
-        case "conclusa":
+        case "risolta":
             return "Conclusa"
         default:
             return "Sconosciuto"
