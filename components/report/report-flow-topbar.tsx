@@ -9,7 +9,7 @@ export function ReportFlowTopbar() {
 
     return (
         <div className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
-            <div className="mx-auto flex h-16 w-full max-w-2xl items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto flex h-16 w-full items-center justify-between">
                 <Button
                     type="button"
                     variant="ghost"

@@ -41,28 +41,27 @@ export function ActivityPage({
     }, [activeTab, createdReports, supportedReports])
 
     return (
-        <main className="min-h-screen bg-background pb-24">
-            <div className="px-4 pt-6 sm:px-6 lg:px-8">
-                <div className="space-y-6">
-                    <ProfileHeader user={userProfile} />
-                </div>
-
-                <div className="mt-6">
-                    <ActivityTabs activeTab={activeTab} onChange={setActiveTab} />
-                </div>
-
-                <div className="mt-6 space-y-4">
-                    {reports.length === 0 ? (
-                        <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
-                            Nessuna segnalazione trovata
-                        </div>
-                    ) : (
-                        reports.map((report) => (
-                            <ActivityCard key={report.id} report={report} />
-                        ))
-                    )}
-                </div>
+        <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-2 sm:px-6 lg:px-8">
+            <div className="space-y-6">
+                <ProfileHeader user={userProfile} />
             </div>
+
+            <div className="mt-6">
+                <ActivityTabs activeTab={activeTab} onChange={setActiveTab} />
+            </div>
+
+            <div className="mt-6 space-y-4">
+                {reports.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+                        Nessuna segnalazione trovata
+                    </div>
+                ) : (
+                    reports.map((report) => (
+                        <ActivityCard key={report.id} report={report} />
+                    ))
+                )}
+            </div>
+
 
             <BottomNav />
         </main>

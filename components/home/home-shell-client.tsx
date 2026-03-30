@@ -18,21 +18,20 @@ export function HomeShellClient({
     const [activeTab, setActiveTab] = useState<HomeTab>("nearby")
 
     return (
-        <main className="min-h-screen bg-background pb-24 lg:pb-10">
-            <div className="mx-auto w-full max-w-6xl">
-                <SearchBar />
-                <TopTabs activeTab={activeTab} onChange={setActiveTab} />
+        <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-2 sm:px-6 lg:px-8">
 
-                <ReportSection
-                    title="Segnalazioni in corso"
-                    reports={ongoingReports}
-                />
+            <SearchBar />
+            <TopTabs activeTab={activeTab} onChange={setActiveTab} />
 
-                <ReportSection
-                    title="Segnalazioni concluse"
-                    reports={resolvedReports}
-                />
-            </div>
+            <ReportSection
+                title="Segnalazioni in corso"
+                reports={ongoingReports}
+            />
+
+            <ReportSection
+                title="Segnalazioni concluse"
+                reports={resolvedReports}
+            />
         </main>
     )
 }

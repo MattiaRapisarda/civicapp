@@ -14,7 +14,7 @@ export function ReportSubmitBar({
     onSubmit,
 }: ReportSubmitBarProps) {
     return (
-        <div className="fixed inset-x-0 bottom-19 z-20 px-4 sm:px-6 lg:hidden">
+        <div className="fixed inset-x-0 bottom-20 z-20 px-4 sm:px-6">
             <div className="mx-auto w-full max-w-md">
                 <Button
                     type="button"

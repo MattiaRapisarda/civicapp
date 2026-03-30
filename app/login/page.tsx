@@ -61,14 +61,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                         <p className="text-sm text-destructive">{error}</p>
                     ) : null}
 
-                    <Button type="submit" className="h-12 w-full rounded-full">
+                    <Button type="submit" className="h-12 w-full rounded-full cursor-pointer">
                         Accedi
                     </Button>
                 </form>
 
                 <p className="mt-5 text-center text-sm text-muted-foreground">
                     Non hai un account?{" "}
-                    <Link href="/signup" className="font-medium text-foreground underline">
+                    <Link href="/signup" className="font-medium text-foreground underline cursor-pointer">
                         Registrati
                     </Link>
                 </p>

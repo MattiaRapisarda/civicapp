@@ -73,10 +73,10 @@ export function NewReportFlow() {
     }
 
     return (
-        <>
+        <main className="mx-auto w-full max-w-5xl px-4 gap-4 pb-28 pt-2 sm:px-6 lg:px-8">
             <ReportFlowTopbar />
 
-            <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pb-40 pt-4 sm:px-6 lg:px-8">
+            <div className="mt-4 flex flex-col gap-6">
                 <ReportFlowHeader
                     title="Nuova segnalazione"
                     description="Aggiungi una foto, indica il punto e descrivi il problema."
@@ -108,13 +108,14 @@ export function NewReportFlow() {
                     onDescriptionChange={setDescription}
                     maxLength={240}
                 />
-            </div>
 
-            <ReportSubmitBar
-                isDisabled={!isValid || isSubmitting}
-                isSubmitting={isSubmitting}
-                onSubmit={handleSubmit}
-            />
-        </>
+
+                <ReportSubmitBar
+                    isDisabled={!isValid || isSubmitting}
+                    isSubmitting={isSubmitting}
+                    onSubmit={handleSubmit}
+                />
+            </div>
+        </main>
     )
 }
