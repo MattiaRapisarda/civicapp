@@ -1,12 +1,10 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { SearchBar } from "@/components/home/search-bar"
+import { SearchBar, type FilterStatus } from "@/components/home/search-bar"
 import { TopTabs, type HomeTab } from "@/components/home/top-tabs"
 import { ReportSection } from "@/components/home/report-section"
 import type { Report } from "@/components/home/report-card"
-
-type FilterStatus = "in_corso" | "concluse" | null
 
 interface HomeShellClientProps {
     ongoingReports: Report[]
@@ -63,8 +61,6 @@ export function HomeShellClient({
                 onSearch={setSearchQuery}
                 onFilterChange={setSelectedFilter}
             />
-
-            <TopTabs activeTab={activeTab} onChange={setActiveTab} />
 
             {hasNoResults ? (
                 <div className="mt-6 rounded-[24px] border bg-card p-6 text-sm text-muted-foreground shadow-sm">
