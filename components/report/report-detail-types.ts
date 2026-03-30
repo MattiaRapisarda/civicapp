@@ -1,4 +1,4 @@
-export type ReportStatus = "in_verifica" | "presa_in_carico" | "conclusa"
+export type ReportStatus = "in_verifica" | "presa_in_carico" | "risolta"
 
 export type ReportUpdateType = "created" | "review" | "progress" | "resolved"
 

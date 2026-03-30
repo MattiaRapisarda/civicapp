@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState, useTransition } from "react"
 import {
     AlertTriangle,
     ArrowLeft,
@@ -18,8 +20,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { StatusBadge } from "@/components/home/status-badge"
+import { createComment } from "@/lib/reports/create-comment"
+import { toggleSupport } from "@/lib/reports/toggle-support"
 import { cn } from "@/lib/utils"
-import type { ReportDetail, ReportUpdate } from "@/components/report/report-detail-types"
+import type {
+    ReportDetail,
+    ReportUpdate,
+} from "@/components/report/report-detail-types"
 
 interface ReportDetailPageProps {
     report: ReportDetail
@@ -56,6 +63,51 @@ function getUpdateIconClasses(type: ReportUpdate["type"]) {
 }
 
 export function ReportDetailPage({ report }: ReportDetailPageProps) {
+    const router = useRouter()
+    const [comment, setComment] = useState("")
+    const [isSupportPending, startSupportTransition] = useTransition()
+    const [isCommentPending, startCommentTransition] = useTransition()
+    const [supportError, setSupportError] = useState<string | null>(null)
+    const [commentError, setCommentError] = useState<string | null>(null)
+
+    const handleToggleSupport = () => {
+        setSupportError(null)
+
+        startSupportTransition(async () => {
+            try {
+                await toggleSupport(report.id)
+                router.refresh()
+            } catch (error) {
+                setSupportError(
+                    error instanceof Error
+                        ? error.message
+                        : "Non è stato possibile aggiornare il supporto."
+                )
+            }
+        })
+    }
+
+    const handleSubmitComment = () => {
+        setCommentError(null)
+
+        startCommentTransition(async () => {
+            try {
+                const formData = new FormData()
+                formData.append("comment", comment)
+
+                await createComment(report.id, formData)
+                setComment("")
+                router.refresh()
+            } catch (error) {
+                setCommentError(
+                    error instanceof Error
+                        ? error.message
+                        : "Non è stato possibile pubblicare il commento."
+                )
+            }
+        })
+    }
+
     return (
         <main className="min-h-screen bg-background pb-28">
             <section className="relative">
@@ -152,14 +204,45 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                             </div>
 
                             <div className="grid gap-3 sm:grid-cols-2">
-                                <Button className="h-12 rounded-full text-sm font-medium">
-                                    <Heart className="mr-2 h-4 w-4" />
-                                    Supporta segnalazione
-                                </Button>
+                                <div className="space-y-2">
+                                    <Button
+                                        onClick={handleToggleSupport}
+                                        disabled={isSupportPending}
+                                        className={cn(
+                                            "h-12 w-full rounded-full text-sm font-medium",
+                                            report.isSupportedByCurrentUser &&
+                                            "bg-foreground text-background hover:bg-foreground/90"
+                                        )}
+                                    >
+                                        <Heart
+                                            className={cn(
+                                                "mr-2 h-4 w-4",
+                                                report.isSupportedByCurrentUser && "fill-current"
+                                            )}
+                                        />
+                                        {isSupportPending
+                                            ? "Aggiornamento..."
+                                            : report.isSupportedByCurrentUser
+                                                ? "Rimuovi supporto"
+                                                : "Supporta segnalazione"}
+                                    </Button>
+
+                                    {supportError ? (
+                                        <p className="text-sm text-destructive">{supportError}</p>
+                                    ) : null}
+                                </div>
 
                                 <Button
                                     variant="outline"
                                     className="h-12 rounded-full border-border text-sm font-medium"
+                                    onClick={() =>
+                                        document
+                                            .getElementById("comment")
+                                            ?.scrollIntoView({
+                                                behavior: "smooth",
+                                                block: "center",
+                                            })
+                                    }
                                 >
                                     <MessageCircle className="mr-2 h-4 w-4" />
                                     Aggiungi commento
@@ -275,37 +358,55 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
 
                                 <textarea
                                     id="comment"
+                                    value={comment}
+                                    onChange={(event) => setComment(event.target.value)}
                                     placeholder="Scrivi un aggiornamento o condividi la tua esperienza..."
                                     className="min-h-[110px] w-full resize-none rounded-[18px] border bg-background px-4 py-3 text-sm outline-none ring-0 placeholder:text-muted-foreground focus:border-foreground/20"
                                 />
 
-                                <div className="mt-3 flex justify-end">
-                                    <Button className="rounded-full">Pubblica commento</Button>
+                                <div className="mt-3 flex items-center justify-between gap-3">
+                                    {commentError ? (
+                                        <p className="text-sm text-destructive">{commentError}</p>
+                                    ) : (
+                                        <span className="text-xs text-muted-foreground">
+                                            Condividi informazioni utili e verificabili.
+                                        </span>
+                                    )}
+
+                                    <Button
+                                        onClick={handleSubmitComment}
+                                        disabled={isCommentPending || comment.trim().length === 0}
+                                        className="rounded-full"
+                                    >
+                                        {isCommentPending
+                                            ? "Pubblicazione..."
+                                            : "Pubblica commento"}
+                                    </Button>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
-                                {report.comments.map((comment) => (
+                                {report.comments.map((commentItem) => (
                                     <div
-                                        key={comment.id}
+                                        key={commentItem.id}
                                         className="rounded-[24px] bg-muted/50 p-4"
                                     >
                                         <div className="flex items-center justify-between gap-3">
                                             <div>
-                                                <p className="font-medium">{comment.author}</p>
+                                                <p className="font-medium">{commentItem.author}</p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {comment.createdAtLabel}
+                                                    {commentItem.createdAtLabel}
                                                 </p>
                                             </div>
 
                                             <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                                 <Heart className="h-4 w-4" />
-                                                <span>{comment.likes}</span>
+                                                <span>{commentItem.likes}</span>
                                             </div>
                                         </div>
 
                                         <p className="mt-3 text-sm leading-6 text-foreground/90">
-                                            {comment.text}
+                                            {commentItem.text}
                                         </p>
                                     </div>
                                 ))}

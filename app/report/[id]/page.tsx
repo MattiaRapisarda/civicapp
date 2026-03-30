@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ReportDetailPage } from "@/components/report/report-detail-page"
-import { getMockReportDetailById } from "@/components/report/report-detail-data"
+import { getReportDetailById } from "@/lib/reports/get-report-detail"
 
 export default async function ReportPage({
     params,
@@ -9,7 +9,7 @@ export default async function ReportPage({
     params: Promise<{ id: string }>
 }) {
     const { id } = await params
-    const report = getMockReportDetailById(id)
+    const report = await getReportDetailById(id)
 
     if (!report) {
         return (

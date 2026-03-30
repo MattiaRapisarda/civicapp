@@ -3,21 +3,42 @@
 import { useMemo, useState } from "react"
 import { ActivityTabs } from "@/components/activity/activity-tabs"
 import { ActivityCard } from "@/components/activity/activity-card"
-import {
+import type {
+    ActivityReport,
+    ActivityTab,
+} from "@/components/activity/activity-types"
+import { BottomNav } from "@/components/navigation/bottom-nav"
+import { ProfileHeader } from "@/components/profile/profile-header"
+
+type UserProfile = {
+    id: string
+    initials: string
+    fullName: string
+    email: string
+    city: string
+    stats: {
+        createdCount: number
+        supportedCount: number
+        resolvedCount: number
+    }
+}
+
+interface ActivityPageProps {
+    userProfile: UserProfile
+    createdReports: ActivityReport[]
+    supportedReports: ActivityReport[]
+}
+
+export function ActivityPage({
+    userProfile,
     createdReports,
     supportedReports,
-} from "@/components/activity/activity-mock-data"
-import type { ActivityTab } from "@/components/activity/activity-types"
-import { BottomNav } from "@/components/navigation/bottom-nav"
-import { ProfileHeader } from "../profile/profile-header"
-import { userProfile } from "../profile/profile-mock-data"
-
-export function ActivityPage() {
+}: ActivityPageProps) {
     const [activeTab, setActiveTab] = useState<ActivityTab>("created")
 
     const reports = useMemo(() => {
         return activeTab === "created" ? createdReports : supportedReports
-    }, [activeTab])
+    }, [activeTab, createdReports, supportedReports])
 
     return (
         <main className="min-h-screen bg-background pb-24">
@@ -40,7 +61,6 @@ export function ActivityPage() {
                             <ActivityCard key={report.id} report={report} />
                         ))
                     )}
-
                 </div>
             </div>
 

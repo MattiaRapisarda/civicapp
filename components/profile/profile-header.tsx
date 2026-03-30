@@ -31,9 +31,6 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
                         </div>
                     </div>
 
-                    <Button className="rounded-full px-5 cursor-pointer">
-                        Modifica profilo
-                    </Button>
                 </div>
 
                 <div className="mt-6 grid grid-cols-3 gap-3">

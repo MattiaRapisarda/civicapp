@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 
-export type ReportStatus = "in_verifica" | "presa_in_carico" | "conclusa"
+export type ReportStatus = "in_verifica" | "presa_in_carico" | "risolta"
 
 interface StatusBadgeProps {
     status: ReportStatus
@@ -12,7 +12,7 @@ function getStatusLabel(status: ReportStatus): string {
             return "In verifica"
         case "presa_in_carico":
             return "Presa in carico"
-        case "conclusa":
+        case "risolta":
             return "Conclusa"
         default:
             return "Sconosciuto"
@@ -20,7 +20,7 @@ function getStatusLabel(status: ReportStatus): string {
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-    if (status === "conclusa") {
+    if (status === "risolta") {
         return (
             <Badge className="rounded-full bg-green-600 hover:bg-green-600">
                 {getStatusLabel(status)}
