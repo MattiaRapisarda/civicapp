@@ -6,7 +6,7 @@ export default async function MapPage() {
 
     return (
         <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-2 sm:px-6 lg:px-8">
-            <div className="h-[calc(100vh-8rem)]">
+            <div className="h-[calc(100vh-6rem)]">
                 <ReportsMapShell reports={reports} />
             </div>
         </main>
