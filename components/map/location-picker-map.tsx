@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useEffect } from "react"
 import L from "leaflet"
 import {
     MapContainer,
@@ -15,18 +15,21 @@ interface LocationPickerMapProps {
     onChange: (coords: { lat: number; lng: number }) => void
 }
 
+const DEFAULT_MAP_CENTER: [number, number] = [37.821522, 15.2263429]
+const DEFAULT_MAP_ZOOM = 15
+
 const selectedIcon = L.divIcon({
     className: "",
     html: `
-    <div style="
-      width: 20px;
-      height: 20px;
-      background: #2563eb;
-      border: 3px solid white;
-      border-radius: 9999px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
-    "></div>
-  `,
+        <div style="
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            border: 3px solid white;
+            border-radius: 9999px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+        "></div>
+    `,
     iconSize: [20, 20],
     iconAnchor: [10, 10],
 })
@@ -48,16 +51,16 @@ function ClickHandler({
     return null
 }
 
-function RecenterMap({
+function SyncView({
     value,
 }: {
     value: { lat: number; lng: number } | null
 }) {
     const map = useMap()
 
-    useMemo(() => {
+    useEffect(() => {
         if (!value) return
-        map.setView([value.lat, value.lng], 16)
+        map.flyTo([value.lat, value.lng], 16, { duration: 0.8 })
     }, [map, value])
 
     return null
@@ -67,16 +70,16 @@ export function LocationPickerMap({
     value,
     onChange,
 }: LocationPickerMapProps) {
-    const center: [number, number] = value
+    const initialCenter: [number, number] = value
         ? [value.lat, value.lng]
-        : [41.9028, 12.4964]
+        : DEFAULT_MAP_CENTER
 
     return (
         <MapContainer
-            center={center}
-            zoom={15}
+            center={initialCenter}
+            zoom={DEFAULT_MAP_ZOOM}
             scrollWheelZoom
-            className="h-[320px] w-full rounded-[28px]"
+            className="h-[320px] w-full"
         >
             <TileLayer
                 attribution="&copy; OpenStreetMap contributors"
@@ -84,7 +87,7 @@ export function LocationPickerMap({
             />
 
             <ClickHandler onChange={onChange} />
-            <RecenterMap value={value} />
+            <SyncView value={value} />
 
             {value ? (
                 <Marker position={[value.lat, value.lng]} icon={selectedIcon} />

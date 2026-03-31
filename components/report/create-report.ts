@@ -31,6 +31,11 @@ export async function createReport(
         const address = formData.get("address")?.toString().trim() ?? ""
         const category = formData.get("category")?.toString().trim() ?? ""
         const description = formData.get("description")?.toString().trim() ?? ""
+        const latValue = formData.get("lat")?.toString().trim() ?? ""
+        const lngValue = formData.get("lng")?.toString().trim() ?? ""
+
+        const lat = Number(latValue)
+        const lng = Number(lngValue)
 
         if (!(image instanceof File)) {
             return {
@@ -67,6 +72,13 @@ export async function createReport(
             }
         }
 
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            return {
+                success: false,
+                error: "Seleziona un punto valido sulla mappa.",
+            }
+        }
+
         const { data: createdReport, error: reportInsertError } = await supabase
             .from("reports")
             .insert({
@@ -76,8 +88,8 @@ export async function createReport(
                 status: "in_verifica",
                 location: address,
                 address,
-                lat: 0,
-                lng: 0,
+                lat,
+                lng,
                 reporter_id: user.id,
             })
             .select("id")
@@ -143,6 +155,7 @@ export async function createReport(
         }
 
         revalidatePath("/")
+        revalidatePath("/map")
         revalidatePath("/activity")
         revalidatePath("/report")
         revalidatePath("/profile")

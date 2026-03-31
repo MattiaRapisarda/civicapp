@@ -31,14 +31,30 @@ const categories: ReportCategoryItem[] = [
     { value: "Altro", label: "Altro", icon: AlertCircle },
 ]
 
+type SelectedCoords = {
+    lat: number
+    lng: number
+}
+
+type LocationSuggestion = {
+    id: string
+    label: string
+    lat: number
+    lng: number
+}
+
 export function NewReportFlow() {
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [imageFile, setImageFile] = useState<File | null>(null)
     const [title, setTitle] = useState("")
     const [address, setAddress] = useState("")
+    const [selectedCoords, setSelectedCoords] = useState<SelectedCoords | null>(
+        null
+    )
     const [category, setCategory] = useState<ReportCategory | null>(null)
     const [description, setDescription] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isLocating, setIsLocating] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
@@ -47,10 +63,11 @@ export function NewReportFlow() {
             imageFile &&
             title.trim() &&
             address.trim() &&
+            selectedCoords &&
             category &&
             description.trim()
         )
-    }, [imageFile, title, address, category, description])
+    }, [imageFile, title, address, selectedCoords, category, description])
 
     function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0]
@@ -78,8 +95,62 @@ export function NewReportFlow() {
         setSuccessMessage(null)
     }
 
+    function handleMapPositionChange(coords: SelectedCoords) {
+        setSelectedCoords(coords)
+        setErrorMessage(null)
+        setSuccessMessage(null)
+    }
+
+    function handleAddressChange(value: string) {
+        setAddress(value)
+        setErrorMessage(null)
+        setSuccessMessage(null)
+    }
+
+    function handleSuggestionSelect(suggestion: LocationSuggestion) {
+        setAddress(suggestion.label)
+        setSelectedCoords({
+            lat: suggestion.lat,
+            lng: suggestion.lng,
+        })
+        setErrorMessage(null)
+        setSuccessMessage(null)
+    }
+
+    function handleUseCurrentLocation() {
+        if (!navigator.geolocation) {
+            setErrorMessage("La geolocalizzazione non è supportata dal browser.")
+            return
+        }
+
+        setIsLocating(true)
+        setErrorMessage(null)
+        setSuccessMessage(null)
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setSelectedCoords({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                })
+                setIsLocating(false)
+            },
+            () => {
+                setIsLocating(false)
+                setErrorMessage(
+                    "Non è stato possibile rilevare la tua posizione."
+                )
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0,
+            }
+        )
+    }
+
     async function handleSubmit() {
-        if (!isValid || !imageFile || !category) return
+        if (!isValid || !imageFile || !category || !selectedCoords) return
 
         try {
             setIsSubmitting(true)
@@ -92,6 +163,8 @@ export function NewReportFlow() {
             formData.append("address", address.trim())
             formData.append("category", category)
             formData.append("description", description.trim())
+            formData.append("lat", String(selectedCoords.lat))
+            formData.append("lng", String(selectedCoords.lng))
 
             const result = await createReport(formData)
 
@@ -108,6 +181,7 @@ export function NewReportFlow() {
             setImageFile(null)
             setTitle("")
             setAddress("")
+            setSelectedCoords(null)
             setCategory(null)
             setDescription("")
             setSuccessMessage("Segnalazione inviata con successo.")
@@ -126,7 +200,7 @@ export function NewReportFlow() {
             <div className="mt-4 flex flex-col gap-6">
                 <ReportFlowHeader
                     title="Nuova segnalazione"
-                    description="Aggiungi una foto, indica il punto e descrivi il problema."
+                    description="Aggiungi una foto, indica il punto esatto sulla mappa e descrivi il problema."
                 />
 
                 <ReportPhotoCard
@@ -137,10 +211,12 @@ export function NewReportFlow() {
 
                 <ReportLocationCard
                     address={address}
-                    onAddressChange={setAddress}
-                    onUseCurrentLocation={() => {
-                        console.log("use current location")
-                    }}
+                    selectedCoords={selectedCoords}
+                    isLocating={isLocating}
+                    onAddressChange={handleAddressChange}
+                    onMapPositionChange={handleMapPositionChange}
+                    onUseCurrentLocation={handleUseCurrentLocation}
+                    onSuggestionSelect={handleSuggestionSelect}
                 />
 
                 <ReportCategoryCard
