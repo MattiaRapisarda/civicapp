@@ -70,7 +70,7 @@ function getStatusLabel(status: MapReport["status"]) {
 
 export function ReportsMap({
     reports,
-    center = [41.9028, 12.4964],
+    center = [37.8108661, 15.1917709],
     zoom = 13,
 }: ReportsMapProps) {
     return (
