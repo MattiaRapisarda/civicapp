@@ -8,50 +8,54 @@ export async function signup(formData: FormData): Promise<void> {
 
     const firstName = String(formData.get("firstName") ?? "").trim()
     const lastName = String(formData.get("lastName") ?? "").trim()
-    const email = String(formData.get("email") ?? "").trim()
+    const email = String(formData.get("email") ?? "")
+        .trim()
+        .toLowerCase()
     const password = String(formData.get("password") ?? "").trim()
 
     if (!firstName || !lastName || !email || !password) {
         redirect("/signup?error=Compila%20tutti%20i%20campi")
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    if (password.length < 8) {
+        redirect("/signup?error=La%20password%20deve%20avere%20almeno%208%20caratteri")
+    }
+
+    const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+            data: {
+                first_name: firstName,
+                last_name: lastName,
+                full_name: `${firstName} ${lastName}`,
+            },
+        },
     })
 
-    if (error || !data.user) {
+    if (error) {
         redirect(
             `/signup?error=${encodeURIComponent(
-                error?.message ?? "Errore nella registrazione"
+                error.message ?? "Errore nella registrazione"
             )}`
         )
     }
 
-    const { error: profileUpdateError } = await supabase
-        .from("profiles")
-        .update({
-            first_name: firstName,
-            last_name: lastName,
-        })
-        .eq("id", data.user.id)
-
-    if (profileUpdateError) {
-        redirect(
-            `/signup?error=${encodeURIComponent(
-                "Profilo creato ma nome e cognome non aggiornati: " +
-                profileUpdateError.message
-            )}`
+    redirect(
+        "/login?message=" +
+        encodeURIComponent(
+            "Registrazione quasi completata. Controlla la tua email e conferma l’account."
         )
-    }
-
-    redirect("/login?message=Account%20creato%20correttamente")
+    )
 }
 
 export async function login(formData: FormData): Promise<void> {
     const supabase = await createSupabaseServerClient()
 
-    const email = String(formData.get("email") ?? "").trim()
+    const email = String(formData.get("email") ?? "")
+        .trim()
+        .toLowerCase()
     const password = String(formData.get("password") ?? "").trim()
 
     if (!email || !password) {
@@ -68,6 +72,19 @@ export async function login(formData: FormData): Promise<void> {
             `/login?error=${encodeURIComponent(
                 error.message || "Credenziali non valide"
             )}`
+        )
+    }
+
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user?.email_confirmed_at) {
+        await supabase.auth.signOut()
+
+        redirect(
+            "/login?error=" +
+            encodeURIComponent("Devi prima confermare la tua email")
         )
     }
 

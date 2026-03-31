@@ -5,12 +5,14 @@ import { signup } from "@/lib/auth/actions"
 type SignupPageProps = {
     searchParams?: Promise<{
         error?: string
+        message?: string
     }>
 }
 
 export default async function SignupPage({ searchParams }: SignupPageProps) {
     const params = searchParams ? await searchParams : undefined
     const error = params?.error
+    const message = params?.message
 
     return (
         <main className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -34,7 +36,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                                 type="text"
                                 required
                                 className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
-                                placeholder="Mattia"
+                                placeholder="Mario"
                             />
                         </div>
 
@@ -48,7 +50,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                                 type="text"
                                 required
                                 className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
-                                placeholder="Rapisarda"
+                                placeholder="Rossi"
                             />
                         </div>
                     </div>
@@ -63,7 +65,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                             type="email"
                             required
                             className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
-                            placeholder="mattia@email.com"
+                            placeholder="tuoindirizzo@email.com"
                         />
                     </div>
 
@@ -76,24 +78,31 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                             name="password"
                             type="password"
                             required
-                            minLength={6}
+                            minLength={8}
                             className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
-                            placeholder="Almeno 6 caratteri"
+                            placeholder="Almeno 8 caratteri"
                         />
                     </div>
+
+                    {message ? (
+                        <p className="text-sm text-emerald-600">{message}</p>
+                    ) : null}
 
                     {error ? (
                         <p className="text-sm text-destructive">{error}</p>
                     ) : null}
 
-                    <Button type="submit" className="h-12 w-full rounded-full">
+                    <Button type="submit" className="h-12 w-full cursor-pointer rounded-full">
                         Registrati
                     </Button>
                 </form>
 
                 <p className="mt-5 text-center text-sm text-muted-foreground">
                     Hai già un account?{" "}
-                    <Link href="/login" className="font-medium text-foreground underline">
+                    <Link
+                        href="/login"
+                        className="font-medium cursor-pointer text-foreground underline"
+                    >
                         Accedi
                     </Link>
                 </p>
