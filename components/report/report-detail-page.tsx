@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { StatusBadge } from "@/components/home/status-badge"
+import { ReportLocationPreviewMapShell } from "@/components/map/report-location-preview-map-shell"
 import { createComment } from "@/lib/reports/create-comment"
 import { toggleSupport } from "@/lib/reports/toggle-support"
 import { cn } from "@/lib/utils"
@@ -120,6 +121,8 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
             }
         })
     }
+
+    const externalMapUrl = `https://www.google.com/maps?q=${report.coordinates.lat},${report.coordinates.lng}`
 
     return (
         <main className="min-h-screen bg-background pb-28">
@@ -274,24 +277,36 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                     </p>
                                 </div>
 
-                                <Button variant="ghost" size="sm" className="cursor-pointer rounded-full">
-                                    Apri mappa
+                                <Button
+                                    asChild
+                                    variant="ghost"
+                                    size="sm"
+                                    className="cursor-pointer rounded-full"
+                                >
+                                    <a
+                                        href={externalMapUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        Apri mappa
+                                    </a>
                                 </Button>
                             </div>
 
                             <div className="overflow-hidden rounded-[24px] border bg-muted/40">
-                                <div className="flex h-[220px] flex-col items-center justify-center gap-3 px-6 text-center">
-                                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-background shadow-sm">
-                                        <MapPin className="h-6 w-6" />
-                                    </div>
+                                <ReportLocationPreviewMapShell
+                                    title={report.title}
+                                    address={report.address}
+                                    lat={report.coordinates.lat}
+                                    lng={report.coordinates.lng}
+                                />
+                            </div>
 
-                                    <div className="space-y-1">
-                                        <p className="font-medium">{report.address}</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            Lat {report.coordinates.lat} · Lng {report.coordinates.lng}
-                                        </p>
-                                    </div>
-                                </div>
+                            <div className="mt-3 rounded-[22px] bg-muted/40 p-4">
+                                <p className="font-medium">{report.address}</p>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    Lat {report.coordinates.lat} · Lng {report.coordinates.lng}
+                                </p>
                             </div>
                         </CardContent>
                     </Card>
@@ -384,7 +399,7 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                     <Button
                                         onClick={handleSubmitComment}
                                         disabled={isCommentPending || comment.trim().length === 0}
-                                        className="rounded-full cursor-pointer"
+                                        className="cursor-pointer rounded-full"
                                     >
                                         {isCommentPending
                                             ? "Pubblicazione..."
@@ -474,11 +489,11 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                     <p className="text-sm text-destructive">{supportError}</p>
                                 ) : null}
                             </div>
-                            <div>
 
+                            <div>
                                 <Button
                                     variant="ghost"
-                                    className="h-12 rounded-full cursor-pointer text-destructive hover:text-destructive"
+                                    className="h-12 cursor-pointer rounded-full text-destructive hover:text-destructive"
                                 >
                                     <ShieldAlert className="mr-2 h-4 w-4" />
                                     Segnala abuso
