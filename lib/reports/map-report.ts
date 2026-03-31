@@ -21,11 +21,14 @@ type ReportListItem = {
     report_supports: {
         user_id: string
     }[]
+    supports: number
+    isSupportedByCurrentUser: boolean
 }
 
 export function mapReportToCard(report: ReportListItem): Report {
     const coverImage =
         report.report_images.find((image) => image.is_cover)?.image_url ??
+        report.report_images[0]?.image_url ??
         "/placeholder.jpg"
 
     return {
@@ -34,7 +37,8 @@ export function mapReportToCard(report: ReportListItem): Report {
         location: report.location,
         status: report.status,
         updatedAtLabel: formatRelativeDate(report.updated_at),
-        supports: report.report_supports.length,
+        supports: report.supports,
         image: coverImage,
+        isSupportedByCurrentUser: report.isSupportedByCurrentUser,
     }
 }

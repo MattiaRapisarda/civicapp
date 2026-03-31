@@ -3,7 +3,13 @@
 import { revalidatePath } from "next/cache"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
-export async function toggleSupport(reportId: string): Promise<void> {
+type ToggleSupportResult = {
+    supported: boolean
+}
+
+export async function toggleSupport(
+    reportId: string
+): Promise<ToggleSupportResult> {
     const supabase = await createSupabaseServerClient()
 
     const {
@@ -11,7 +17,11 @@ export async function toggleSupport(reportId: string): Promise<void> {
         error: userError,
     } = await supabase.auth.getUser()
 
+    console.log("TOGGLE SUPPORT - reportId:", reportId)
+    console.log("TOGGLE SUPPORT - userId:", user?.id ?? null)
+
     if (userError || !user) {
+        console.error("TOGGLE SUPPORT - userError:", userError)
         throw new Error("Utente non autenticato")
     }
 
@@ -19,19 +29,20 @@ export async function toggleSupport(reportId: string): Promise<void> {
         throw new Error("Segnalazione non valida")
     }
 
-    // 🔍 Controllo esistenza supporto
     const { data: existingSupport, error: existingSupportError } = await supabase
         .from("report_supports")
-        .select("report_id")
+        .select("report_id, user_id")
         .eq("report_id", reportId)
         .eq("user_id", user.id)
         .maybeSingle()
+
+    console.log("TOGGLE SUPPORT - existingSupport:", existingSupport)
+    console.log("TOGGLE SUPPORT - existingSupportError:", existingSupportError)
 
     if (existingSupportError) {
         throw new Error(existingSupportError.message)
     }
 
-    // ❌ Se esiste → rimuovi
     if (existingSupport) {
         const { error: deleteError } = await supabase
             .from("report_supports")
@@ -39,26 +50,37 @@ export async function toggleSupport(reportId: string): Promise<void> {
             .eq("report_id", reportId)
             .eq("user_id", user.id)
 
+        console.log("TOGGLE SUPPORT - deleteError:", deleteError)
+
         if (deleteError) {
             throw new Error(deleteError.message)
         }
-    }
-    // ➕ Se NON esiste → aggiungi
-    else {
-        const { error: insertError } = await supabase
-            .from("report_supports")
-            .insert({
-                report_id: reportId,
-                user_id: user.id,
-            })
 
-        if (insertError) {
-            throw new Error(insertError.message)
-        }
+        revalidatePath("/")
+        revalidatePath("/activity")
+        revalidatePath(`/report/${reportId}`)
+
+        return { supported: false }
     }
 
-    // 🔄 Revalidate
+    const { data: insertedRow, error: insertError } = await supabase
+        .from("report_supports")
+        .insert({
+            report_id: reportId,
+            user_id: user.id,
+        })
+        .select()
+
+    console.log("TOGGLE SUPPORT - insertedRow:", insertedRow)
+    console.log("TOGGLE SUPPORT - insertError:", insertError)
+
+    if (insertError) {
+        throw new Error(insertError.message)
+    }
+
     revalidatePath("/")
     revalidatePath("/activity")
     revalidatePath(`/report/${reportId}`)
+
+    return { supported: true }
 }

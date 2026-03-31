@@ -1,5 +1,12 @@
+"use client"
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useEffect, useState, useTransition } from "react"
 import { Clock3, Heart } from "lucide-react"
+
+import { toggleSupport } from "@/lib/reports/toggle-support"
+import { cn } from "@/lib/utils"
 import { StatusBadge, type ReportStatus } from "@/components/home/status-badge"
 
 export interface Report {
@@ -10,6 +17,7 @@ export interface Report {
     updatedAtLabel: string
     supports: number
     image: string
+    isSupportedByCurrentUser: boolean
 }
 
 interface ReportCardProps {
@@ -17,6 +25,67 @@ interface ReportCardProps {
 }
 
 export function ReportCard({ report }: ReportCardProps) {
+    const router = useRouter()
+    const [isPending, startTransition] = useTransition()
+    const [supportError, setSupportError] = useState<string | null>(null)
+
+    const [optimisticSupported, setOptimisticSupported] = useState(
+        report.isSupportedByCurrentUser
+    )
+    const [optimisticSupports, setOptimisticSupports] = useState(report.supports)
+
+    useEffect(() => {
+        setOptimisticSupported(report.isSupportedByCurrentUser)
+    }, [report.isSupportedByCurrentUser])
+
+    useEffect(() => {
+        setOptimisticSupports(report.supports)
+    }, [report.supports])
+
+    const handleToggleSupport = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setSupportError(null)
+
+        const previousSupported = optimisticSupported
+        const previousSupports = optimisticSupports
+
+        const nextSupported = !previousSupported
+        const nextSupports = nextSupported
+            ? previousSupports + 1
+            : Math.max(0, previousSupports - 1)
+
+        setOptimisticSupported(nextSupported)
+        setOptimisticSupports(nextSupports)
+
+        startTransition(async () => {
+            try {
+                const result = await toggleSupport(report.id)
+
+                setOptimisticSupported(result.supported)
+                setOptimisticSupports((currentSupports) => {
+                    if (result.supported === previousSupported) {
+                        return previousSupports
+                    }
+
+                    return result.supported
+                        ? previousSupports + 1
+                        : Math.max(0, previousSupports - 1)
+                })
+
+                router.refresh()
+            } catch (error) {
+                setOptimisticSupported(previousSupported)
+                setOptimisticSupports(previousSupports)
+                setSupportError(
+                    error instanceof Error
+                        ? error.message
+                        : "Non è stato possibile aggiornare il supporto."
+                )
+            }
+        })
+    }
+
     return (
         <Link
             href={`/report/${report.id}`}
@@ -37,14 +106,28 @@ export function ReportCard({ report }: ReportCardProps) {
 
                     <button
                         type="button"
-                        onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                        }}
-                        className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/10 backdrop-blur-sm"
-                        aria-label="Aggiungi ai preferiti"
+                        onClick={handleToggleSupport}
+                        disabled={isPending}
+                        className={cn(
+                            "absolute right-3 top-3 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200",
+                            optimisticSupported
+                                ? "bg-white/90 scale-110"
+                                : "bg-black/20 hover:scale-105"
+                        )}
+                        aria-label={
+                            optimisticSupported
+                                ? "Rimuovi supporto"
+                                : "Aggiungi supporto"
+                        }
                     >
-                        <Heart className="h-5 w-5 text-white" />
+                        <Heart
+                            className={cn(
+                                "h-5 w-5 transition-all duration-200",
+                                optimisticSupported
+                                    ? "fill-red-500 text-red-500 scale-110"
+                                    : "text-white"
+                            )}
+                        />
                     </button>
                 </div>
 
@@ -63,8 +146,14 @@ export function ReportCard({ report }: ReportCardProps) {
                     </div>
 
                     <p className="mt-1 text-sm text-muted-foreground">
-                        {report.supports} supporti · stato pubblico
+                        {optimisticSupports} supporti · stato pubblico
                     </p>
+
+                    {supportError ? (
+                        <p className="mt-1 text-xs text-destructive">
+                            {supportError}
+                        </p>
+                    ) : null}
                 </div>
             </article>
         </Link>

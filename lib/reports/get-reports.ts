@@ -20,10 +20,23 @@ export type ReportListItem = {
     report_supports: {
         user_id: string
     }[]
+    supports: number
+    isSupportedByCurrentUser: boolean
 }
 
 export async function getReports(): Promise<ReportListItem[]> {
     const supabase = await createSupabaseServerClient()
+
+    const {
+        data: { user },
+        error: userError,
+    } = await supabase.auth.getUser()
+
+    console.log("GET REPORTS - USER ID:", user?.id ?? null)
+
+    if (userError) {
+        console.error("Errore recupero utente:", userError)
+    }
 
     const { data, error } = await supabase
         .from("reports")
@@ -55,9 +68,28 @@ export async function getReports(): Promise<ReportListItem[]> {
         return []
     }
 
-    return (data ?? []).map((report) => ({
-        ...report,
-        report_images: report.report_images ?? [],
-        report_supports: report.report_supports ?? [],
-    })) as ReportListItem[]
+    const mapped = (data ?? []).map((report) => {
+        const reportImages = report.report_images ?? []
+        const reportSupports = report.report_supports ?? []
+        const isSupportedByCurrentUser = reportSupports.some(
+            (support) => support.user_id === user?.id
+        )
+
+        console.log("REPORT DEBUG:", {
+            reportId: report.id,
+            supportUserIds: reportSupports.map((support) => support.user_id),
+            currentUserId: user?.id ?? null,
+            isSupportedByCurrentUser,
+        })
+
+        return {
+            ...report,
+            report_images: reportImages,
+            report_supports: reportSupports,
+            supports: reportSupports.length,
+            isSupportedByCurrentUser,
+        }
+    })
+
+    return mapped as ReportListItem[]
 }
