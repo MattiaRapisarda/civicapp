@@ -38,7 +38,7 @@ export default function ReportLocationPreviewMap({
             center={[lat, lng]}
             zoom={16}
             scrollWheelZoom={false}
-            className="h-[220px] w-full"
+            className="h-55 w-full"
         >
             <TileLayer
                 attribution="&copy; OpenStreetMap contributors"
@@ -47,7 +47,7 @@ export default function ReportLocationPreviewMap({
 
             <Marker position={[lat, lng]} icon={reportPinIcon}>
                 <Popup>
-                    <div className="min-w-[180px] space-y-1">
+                    <div className="min-w-45 space-y-1">
                         <p className="text-sm font-semibold">{title}</p>
                         <p className="text-xs text-muted-foreground">{address}</p>
                     </div>

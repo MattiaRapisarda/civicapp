@@ -7,7 +7,7 @@ const ReportLocationPreviewMap = dynamic(
     {
         ssr: false,
         loading: () => (
-            <div className="h-[220px] w-full animate-pulse rounded-[24px] bg-muted" />
+            <div className="h-55 w-full animate-pulse rounded-[24px] bg-muted" />
         ),
     }
 )

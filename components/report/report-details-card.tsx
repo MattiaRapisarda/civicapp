@@ -48,7 +48,7 @@ export function ReportDetailsCard({
                         }
                         placeholder="Descrivi il problema..."
                         maxLength={maxLength}
-                        className="min-h-[120px]"
+                        className="min-h-30"
                     />
                     <p className="text-right text-xs text-muted-foreground">
                         {description.length}/{maxLength}

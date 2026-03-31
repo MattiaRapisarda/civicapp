@@ -127,14 +127,14 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
     return (
         <main className="min-h-screen bg-background pb-28">
             <section className="relative">
-                <div className="relative h-[280px] w-full overflow-hidden sm:h-[360px]">
+                <div className="relative h-70 w-full overflow-hidden sm:h-90">
                     <img
                         src={report.image}
                         alt={report.title}
                         className="h-full w-full object-cover"
                     />
 
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-background" />
+                    <div className="absolute inset-0 bg-linear-to-b from-black/40 via-black/10 to-background" />
 
                     <div className="absolute left-0 right-0 top-0 z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-4 pt-5 sm:px-6 lg:px-8">
                         <Button
@@ -384,7 +384,7 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                     value={comment}
                                     onChange={(event) => setComment(event.target.value)}
                                     placeholder="Scrivi un aggiornamento o condividi la tua esperienza..."
-                                    className="min-h-[110px] w-full resize-none rounded-[18px] border bg-background px-4 py-3 text-sm outline-none ring-0 placeholder:text-muted-foreground focus:border-foreground/20"
+                                    className="min-h-27.5 w-full resize-none rounded-[18px] border bg-background px-4 py-3 text-sm outline-none ring-0 placeholder:text-muted-foreground focus:border-foreground/20"
                                 />
 
                                 <div className="mt-3 flex items-center justify-between gap-3">

@@ -79,7 +79,7 @@ export function LocationPickerMap({
             center={initialCenter}
             zoom={DEFAULT_MAP_ZOOM}
             scrollWheelZoom
-            className="h-[320px] w-full"
+            className="h-80 w-full"
         >
             <TileLayer
                 attribution="&copy; OpenStreetMap contributors"

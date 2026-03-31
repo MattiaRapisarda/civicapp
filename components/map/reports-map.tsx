@@ -98,7 +98,7 @@ export function ReportsMap({
                             icon={createCategoryIcon(report.category)}
                         >
                             <Popup>
-                                <div className="min-w-[220px] space-y-2">
+                                <div className="min-w-55 space-y-2">
                                     <h3 className="text-sm font-semibold">
                                         {report.title}
                                     </h3>

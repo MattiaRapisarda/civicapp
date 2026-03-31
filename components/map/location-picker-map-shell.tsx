@@ -10,7 +10,7 @@ const LocationPickerMap = dynamic(
     {
         ssr: false,
         loading: () => (
-            <div className="h-[320px] w-full animate-pulse rounded-[24px] bg-muted" />
+            <div className="h-80 w-full animate-pulse rounded-[24px] bg-muted" />
         ),
     }
 )

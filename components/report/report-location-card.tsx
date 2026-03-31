@@ -147,7 +147,7 @@ export function ReportLocationCard({
                         ) : null}
 
                         {isSuggestionsOpen && suggestions.length > 0 ? (
-                            <div className="absolute z-[1000] mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border bg-background p-2 shadow-lg">
+                            <div className="absolute z-1000 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border bg-background p-2 shadow-lg">
                                 {suggestions.map((suggestion) => (
                                     <button
                                         key={suggestion.id}
