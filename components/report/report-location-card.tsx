@@ -18,6 +18,19 @@ type LocationSuggestion = {
     lng: number
 }
 
+type NominatimResponse = {
+    display_name?: string
+    address?: {
+        road?: string
+        pedestrian?: string
+        house_number?: string
+        city?: string
+        town?: string
+        village?: string
+        postcode?: string
+    }
+}
+
 interface ReportLocationCardProps {
     address: string
     selectedCoords: SelectedCoords | null
@@ -40,6 +53,7 @@ export function ReportLocationCard({
     const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
     const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false)
+    const [isResolvingAddress, setIsResolvingAddress] = useState(false)
 
     const normalizedAddress = useMemo(() => address.trim(), [address])
 
@@ -94,10 +108,59 @@ export function ReportLocationCard({
         }
     }, [normalizedAddress])
 
+    async function reverseGeocode(lat: number, lng: number) {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
+            {
+                headers: {
+                    Accept: "application/json",
+                },
+            }
+        )
+
+        if (!response.ok) {
+            throw new Error("Impossibile recuperare l'indirizzo")
+        }
+
+        const data: NominatimResponse = await response.json()
+
+        const street = data.address?.road ?? data.address?.pedestrian ?? ""
+        const houseNumber = data.address?.house_number ?? ""
+        const city =
+            data.address?.city ??
+            data.address?.town ??
+            data.address?.village ??
+            ""
+        const postcode = data.address?.postcode ?? ""
+
+        return (
+            data.display_name ??
+            [street, houseNumber, city, postcode].filter(Boolean).join(", ")
+        )
+    }
+
     function handleSelectSuggestion(suggestion: LocationSuggestion) {
         onSuggestionSelect(suggestion)
+        onAddressChange(suggestion.label)
         setSuggestions([])
         setIsSuggestionsOpen(false)
+    }
+
+    async function handleMapPositionChange(coords: SelectedCoords) {
+        onMapPositionChange(coords)
+
+        try {
+            setIsResolvingAddress(true)
+            const resolvedAddress = await reverseGeocode(coords.lat, coords.lng)
+
+            if (resolvedAddress) {
+                onAddressChange(resolvedAddress)
+            }
+        } catch (error) {
+            console.error("REVERSE GEOCODING ERROR:", error)
+        } finally {
+            setIsResolvingAddress(false)
+        }
     }
 
     return (
@@ -119,7 +182,7 @@ export function ReportLocationCard({
                     <div className="overflow-hidden rounded-[24px] bg-muted/40">
                         <LocationPickerMapShell
                             value={selectedCoords}
-                            onChange={onMapPositionChange}
+                            onChange={handleMapPositionChange}
                         />
                     </div>
 
@@ -175,10 +238,17 @@ export function ReportLocationCard({
                         <ChevronRight className="h-4 w-4" />
                     </Button>
 
-                    {selectedCoords ? (
+                    {isResolvingAddress ? (
                         <div className="rounded-2xl border bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
-                            Coordinate selezionate: {selectedCoords.lat.toFixed(6)},{" "}
-                            {selectedCoords.lng.toFixed(6)}
+                            Recupero indirizzo...
+                        </div>
+                    ) : address.trim() ? (
+                        <div className="rounded-2xl border bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
+                            Indirizzo selezionato: {address}
+                        </div>
+                    ) : selectedCoords ? (
+                        <div className="rounded-2xl border bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
+                            Punto selezionato sulla mappa
                         </div>
                     ) : (
                         <div className="rounded-2xl border border-dashed bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
