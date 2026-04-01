@@ -16,18 +16,30 @@ import {
     Wrench,
 } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { StatusBadge } from "@/components/home/status-badge"
 import { ReportLocationPreviewMapShell } from "@/components/map/report-location-preview-map-shell"
-import { createComment } from "@/lib/reports/create-comment"
-import { toggleSupport } from "@/lib/reports/toggle-support"
-import { cn } from "@/lib/utils"
 import type {
     ReportDetail,
     ReportUpdate,
 } from "@/components/report/report-detail-types"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { createAbuseReport } from "@/lib/reports/create-abuse-report"
+import { createComment } from "@/lib/reports/create-comment"
+import { toggleSupport } from "@/lib/reports/toggle-support"
+import { cn } from "@/lib/utils"
 
 interface ReportDetailPageProps {
     report: ReportDetail
@@ -65,11 +77,20 @@ function getUpdateIconClasses(type: ReportUpdate["type"]) {
 
 export function ReportDetailPage({ report }: ReportDetailPageProps) {
     const router = useRouter()
+
     const [comment, setComment] = useState("")
     const [isSupportPending, startSupportTransition] = useTransition()
     const [isCommentPending, startCommentTransition] = useTransition()
+    const [isAbusePending, startAbuseTransition] = useTransition()
+
     const [supportError, setSupportError] = useState<string | null>(null)
     const [commentError, setCommentError] = useState<string | null>(null)
+
+    const [isAbuseDialogOpen, setIsAbuseDialogOpen] = useState(false)
+    const [abuseReason, setAbuseReason] = useState("")
+    const [abuseDetails, setAbuseDetails] = useState("")
+    const [abuseError, setAbuseError] = useState<string | null>(null)
+    const [abuseSuccess, setAbuseSuccess] = useState<string | null>(null)
 
     const handleToggleSupport = () => {
         setSupportError(null)
@@ -117,6 +138,47 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                     error instanceof Error
                         ? error.message
                         : "Non è stato possibile pubblicare il commento."
+                )
+            }
+        })
+    }
+
+    const handleSubmitAbuseReport = () => {
+        setAbuseError(null)
+        setAbuseSuccess(null)
+
+        startAbuseTransition(async () => {
+            try {
+                if (!abuseReason) {
+                    setAbuseError("Seleziona il tipo di abuso.")
+                    return
+                }
+
+                const formData = new FormData()
+                formData.append("reason", abuseReason)
+                formData.append("details", abuseDetails.trim())
+
+                const result = await createAbuseReport(report.id, formData)
+
+                if (!result.success) {
+                    setAbuseError(result.error)
+                    return
+                }
+
+                setAbuseSuccess("Segnalazione inviata correttamente.")
+                setAbuseReason("")
+                setAbuseDetails("")
+                router.refresh()
+
+                setTimeout(() => {
+                    setIsAbuseDialogOpen(false)
+                    setAbuseSuccess(null)
+                }, 1000)
+            } catch (error) {
+                setAbuseError(
+                    error instanceof Error
+                        ? error.message
+                        : "Non è stato possibile inviare la segnalazione."
                 )
             }
         })
@@ -252,12 +314,10 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                     variant="outline"
                                     className="h-12 cursor-pointer rounded-full border-border text-sm font-medium"
                                     onClick={() =>
-                                        document
-                                            .getElementById("comment")
-                                            ?.scrollIntoView({
-                                                behavior: "smooth",
-                                                block: "center",
-                                            })
+                                        document.getElementById("comment")?.scrollIntoView({
+                                            behavior: "smooth",
+                                            block: "center",
+                                        })
                                     }
                                 >
                                     <MessageCircle className="mr-2 h-4 w-4" />
@@ -283,11 +343,7 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                                     size="sm"
                                     className="cursor-pointer rounded-full"
                                 >
-                                    <a
-                                        href={externalMapUrl}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
+                                    <a href={externalMapUrl} target="_blank" rel="noreferrer">
                                         Apri mappa
                                     </a>
                                 </Button>
@@ -491,13 +547,171 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
                             </div>
 
                             <div>
-                                <Button
-                                    variant="ghost"
-                                    className="h-12 cursor-pointer rounded-full text-destructive hover:text-destructive"
+                                <Dialog
+                                    open={isAbuseDialogOpen}
+                                    onOpenChange={(open) => {
+                                        setIsAbuseDialogOpen(open)
+
+                                        if (!open) {
+                                            setAbuseReason("")
+                                            setAbuseDetails("")
+                                            setAbuseError(null)
+                                            setAbuseSuccess(null)
+                                        }
+                                    }}
                                 >
-                                    <ShieldAlert className="mr-2 h-4 w-4" />
-                                    Segnala abuso
-                                </Button>
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            className="h-12 cursor-pointer rounded-full text-destructive hover:text-destructive"
+                                        >
+                                            <ShieldAlert className="mr-2 h-4 w-4" />
+                                            Segnala abuso
+                                        </Button>
+                                    </DialogTrigger>
+
+                                    <DialogContent className="rounded-[24px] sm:max-w-md">
+                                        <DialogHeader>
+                                            <DialogTitle>Segnala abuso</DialogTitle>
+                                            <DialogDescription>
+                                                Indica il motivo per cui ritieni questa segnalazione
+                                                non appropriata.
+                                            </DialogDescription>
+                                        </DialogHeader>
+
+                                        <div className="space-y-5">
+                                            <div className="space-y-3">
+                                                <Label>Tipo di abuso</Label>
+
+                                                <RadioGroup
+                                                    value={abuseReason}
+                                                    onValueChange={setAbuseReason}
+                                                    className="space-y-3"
+                                                >
+                                                    <div className="flex items-center space-x-3 rounded-[16px] border p-3">
+                                                        <RadioGroupItem
+                                                            value="non_veritiero"
+                                                            id="abuse-non-veritiero"
+                                                        />
+                                                        <Label
+                                                            htmlFor="abuse-non-veritiero"
+                                                            className="cursor-pointer"
+                                                        >
+                                                            Non veritiero
+                                                        </Label>
+                                                    </div>
+
+                                                    <div className="flex items-center space-x-3 rounded-[16px] border p-3">
+                                                        <RadioGroupItem
+                                                            value="non_inerente"
+                                                            id="abuse-non-inerente"
+                                                        />
+                                                        <Label
+                                                            htmlFor="abuse-non-inerente"
+                                                            className="cursor-pointer"
+                                                        >
+                                                            Non inerente
+                                                        </Label>
+                                                    </div>
+
+                                                    <div className="flex items-center space-x-3 rounded-[16px] border p-3">
+                                                        <RadioGroupItem
+                                                            value="offensivo"
+                                                            id="abuse-offensivo"
+                                                        />
+                                                        <Label
+                                                            htmlFor="abuse-offensivo"
+                                                            className="cursor-pointer"
+                                                        >
+                                                            Offensivo
+                                                        </Label>
+                                                    </div>
+
+                                                    <div className="flex items-center space-x-3 rounded-[16px] border p-3">
+                                                        <RadioGroupItem
+                                                            value="spam"
+                                                            id="abuse-spam"
+                                                        />
+                                                        <Label
+                                                            htmlFor="abuse-spam"
+                                                            className="cursor-pointer"
+                                                        >
+                                                            Spam
+                                                        </Label>
+                                                    </div>
+
+                                                    <div className="flex items-center space-x-3 rounded-[16px] border p-3">
+                                                        <RadioGroupItem
+                                                            value="altro"
+                                                            id="abuse-altro"
+                                                        />
+                                                        <Label
+                                                            htmlFor="abuse-altro"
+                                                            className="cursor-pointer"
+                                                        >
+                                                            Altro
+                                                        </Label>
+                                                    </div>
+                                                </RadioGroup>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="abuse-details">
+                                                    Dettagli aggiuntivi
+                                                    <span className="ml-1 text-muted-foreground">
+                                                        (opzionale)
+                                                    </span>
+                                                </Label>
+
+                                                <textarea
+                                                    id="abuse-details"
+                                                    value={abuseDetails}
+                                                    onChange={(event) =>
+                                                        setAbuseDetails(event.target.value)
+                                                    }
+                                                    placeholder="Aggiungi informazioni utili per la verifica..."
+                                                    className="min-h-28 w-full resize-none rounded-[18px] border bg-background px-4 py-3 text-sm outline-none ring-0 placeholder:text-muted-foreground focus:border-foreground/20"
+                                                />
+                                            </div>
+
+                                            {abuseError ? (
+                                                <p className="text-sm text-destructive">
+                                                    {abuseError}
+                                                </p>
+                                            ) : abuseSuccess ? (
+                                                <p className="text-sm text-emerald-600">
+                                                    {abuseSuccess}
+                                                </p>
+                                            ) : (
+                                                <p className="text-xs text-muted-foreground">
+                                                    La tua segnalazione verrà registrata e verificata.
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <DialogFooter>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                className="rounded-full"
+                                                onClick={() => setIsAbuseDialogOpen(false)}
+                                            >
+                                                Annulla
+                                            </Button>
+
+                                            <Button
+                                                type="button"
+                                                className="rounded-full"
+                                                onClick={handleSubmitAbuseReport}
+                                                disabled={isAbusePending || !abuseReason}
+                                            >
+                                                {isAbusePending
+                                                    ? "Invio..."
+                                                    : "Invia segnalazione"}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         </CardContent>
                     </Card>
