@@ -54,7 +54,8 @@ export async function signup(formData: FormData): Promise<void> {
     redirect(
         "/login?message=" +
         encodeURIComponent(
-            "Registrazione quasi completata. Controlla la tua email e conferma l’account."
+            "Registrazione avvenuta con successo."
+            //"Registrazione quasi completata. Controlla la tua email e conferma l’account."
         )
     )
 }
