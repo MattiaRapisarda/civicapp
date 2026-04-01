@@ -35,7 +35,8 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                                 name="firstName"
                                 type="text"
                                 required
-                                className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
+                                autoComplete="given-name"
+                                className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition-colors focus:border-foreground/20"
                                 placeholder="Mario"
                             />
                         </div>
@@ -49,7 +50,8 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                                 name="lastName"
                                 type="text"
                                 required
-                                className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
+                                autoComplete="family-name"
+                                className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition-colors focus:border-foreground/20"
                                 placeholder="Rossi"
                             />
                         </div>
@@ -64,7 +66,8 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                             name="email"
                             type="email"
                             required
-                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
+                            autoComplete="email"
+                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition-colors focus:border-foreground/20"
                             placeholder="tuoindirizzo@email.com"
                         />
                     </div>
@@ -79,9 +82,48 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                             type="password"
                             required
                             minLength={8}
-                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
+                            autoComplete="new-password"
+                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition-colors focus:border-foreground/20"
                             placeholder="Almeno 8 caratteri"
                         />
+                    </div>
+
+                    <div className="rounded-2xl border bg-background/60 p-4">
+                        <div className="flex items-start gap-3">
+                            <input
+                                id="acceptTerms"
+                                name="acceptTerms"
+                                type="checkbox"
+                                value="accepted"
+                                required
+                                className="mt-1 h-4 w-4 rounded border"
+                            />
+
+                            <label
+                                htmlFor="acceptTerms"
+                                className="text-sm leading-6 text-muted-foreground"
+                            >
+                                Accetto la{" "}
+                                <Link
+                                    href="/privacy.pdf"
+                                    className="font-medium text-foreground underline underline-offset-4"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Privacy Policy
+                                </Link>{" "}
+                                e i{" "}
+                                <Link
+                                    href="/termini.pdf"
+                                    className="font-medium text-foreground underline underline-offset-4"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Termini e Condizioni
+                                </Link>
+                                .
+                            </label>
+                        </div>
                     </div>
 
                     {message ? (
@@ -101,7 +143,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                     Hai già un account?{" "}
                     <Link
                         href="/login"
-                        className="font-medium cursor-pointer text-foreground underline"
+                        className="cursor-pointer font-medium text-foreground underline underline-offset-4"
                     >
                         Accedi
                     </Link>

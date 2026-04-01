@@ -12,6 +12,7 @@ export async function signup(formData: FormData): Promise<void> {
         .trim()
         .toLowerCase()
     const password = String(formData.get("password") ?? "").trim()
+    const acceptTerms = String(formData.get("acceptTerms") ?? "").trim()
 
     if (!firstName || !lastName || !email || !password) {
         redirect("/signup?error=Compila%20tutti%20i%20campi")
@@ -19,6 +20,13 @@ export async function signup(formData: FormData): Promise<void> {
 
     if (password.length < 8) {
         redirect("/signup?error=La%20password%20deve%20avere%20almeno%208%20caratteri")
+    }
+
+    if (!acceptTerms) {
+        redirect(
+            "/signup?error=" +
+            encodeURIComponent("Devi accettare la Privacy Policy e i Termini e Condizioni")
+        )
     }
 
     const { error } = await supabase.auth.signUp({
@@ -30,6 +38,7 @@ export async function signup(formData: FormData): Promise<void> {
                 first_name: firstName,
                 last_name: lastName,
                 full_name: `${firstName} ${lastName}`,
+                accepted_terms: true,
             },
         },
     })
