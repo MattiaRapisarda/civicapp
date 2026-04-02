@@ -34,11 +34,11 @@ export async function updateReportStatus(input: UpdateReportStatusInput) {
     const { supabase } = await requireAdmin()
 
     if (!input.reportId) {
-        throw new Error("ID segnalazione mancante")
+        return { success: false, message: "ID segnalazione mancante" }
     }
 
     if (!isValidStatus(input.status)) {
-        throw new Error("Stato non valido")
+        return { success: false, message: "Stato non valido" }
     }
 
     const now = new Date().toISOString()
@@ -53,7 +53,11 @@ export async function updateReportStatus(input: UpdateReportStatusInput) {
         .eq("id", input.reportId)
 
     if (updateError) {
-        throw new Error("Impossibile aggiornare lo stato della segnalazione")
+        console.error("Errore update reports:", updateError)
+        return {
+            success: false,
+            message: `Errore aggiornamento report: ${updateError.message}`,
+        }
     }
 
     const readableStatusMap: Record<ReportStatus, string> = {
@@ -78,11 +82,17 @@ export async function updateReportStatus(input: UpdateReportStatusInput) {
         })
 
     if (timelineError) {
-        throw new Error("Stato aggiornato, ma non è stato possibile salvare la timeline")
+        console.error("Errore insert report_updates:", timelineError)
+        return {
+            success: false,
+            message: `Stato aggiornato, ma timeline non salvata: ${timelineError.message}`,
+        }
     }
 
     revalidatePath("/backoffice")
     revalidatePath(`/report/${input.reportId}`)
+
+    return { success: true }
 }
 
 export async function addTimelineUpdate(input: AddTimelineUpdateInput) {
@@ -92,11 +102,14 @@ export async function addTimelineUpdate(input: AddTimelineUpdateInput) {
     const description = input.description.trim()
 
     if (!input.reportId) {
-        throw new Error("ID segnalazione mancante")
+        return { success: false, message: "ID segnalazione mancante" }
     }
 
     if (!title || !description) {
-        throw new Error("Titolo e descrizione sono obbligatori")
+        return {
+            success: false,
+            message: "Titolo e descrizione sono obbligatori",
+        }
     }
 
     const { error: insertError } = await supabase
@@ -110,7 +123,11 @@ export async function addTimelineUpdate(input: AddTimelineUpdateInput) {
         })
 
     if (insertError) {
-        throw new Error("Impossibile aggiungere l'aggiornamento")
+        console.error("Errore insert timeline:", insertError)
+        return {
+            success: false,
+            message: `Errore inserimento aggiornamento: ${insertError.message}`,
+        }
     }
 
     const { error: reportTouchError } = await supabase
@@ -121,9 +138,15 @@ export async function addTimelineUpdate(input: AddTimelineUpdateInput) {
         .eq("id", input.reportId)
 
     if (reportTouchError) {
-        throw new Error("Aggiornamento inserito, ma non è stato possibile aggiornare la segnalazione")
+        console.error("Errore touch report:", reportTouchError)
+        return {
+            success: false,
+            message: `Aggiornamento salvato, ma report non aggiornato: ${reportTouchError.message}`,
+        }
     }
 
     revalidatePath("/backoffice")
     revalidatePath(`/report/${input.reportId}`)
+
+    return { success: true }
 }
