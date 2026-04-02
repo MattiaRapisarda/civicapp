@@ -2,20 +2,18 @@
 
 import { useMemo, useState } from "react"
 import { SearchBar, type FilterStatus } from "@/components/home/search-bar"
-import { TopTabs, type HomeTab } from "@/components/home/top-tabs"
 import { ReportSection } from "@/components/home/report-section"
-import type { Report } from "@/components/home/report-card"
+import type { ReportCardItem } from "@/components/home/report-card.types"
 
 interface HomeShellClientProps {
-    ongoingReports: Report[]
-    resolvedReports: Report[]
+    ongoingReports: ReportCardItem[]
+    resolvedReports: ReportCardItem[]
 }
 
 export function HomeShellClient({
     ongoingReports,
     resolvedReports,
 }: HomeShellClientProps) {
-    const [activeTab, setActiveTab] = useState<HomeTab>("nearby")
     const [searchQuery, setSearchQuery] = useState("")
     const [selectedFilter, setSelectedFilter] = useState<FilterStatus>(null)
 

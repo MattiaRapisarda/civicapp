@@ -1,9 +1,10 @@
-import { ReportCard, type Report } from "@/components/home/report-card"
-import { SectionHeader } from "@/components/home/section-header"
+import { ReportCard } from "@/components/home/report-card"
+import type { ReportCardItem } from "@/components/home/report-card.types"
+import { SectionHeader } from "./section-header"
 
 interface ReportSectionProps {
     title: string
-    reports: Report[]
+    reports: ReportCardItem[]
 }
 
 export function ReportSection({ title, reports }: ReportSectionProps) {

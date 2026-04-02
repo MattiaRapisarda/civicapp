@@ -1,13 +1,11 @@
-import { getReports } from "@/lib/reports/get-reports"
-import { mapReportToCard } from "@/lib/reports/map-report"
+import { getReportCards } from "@/lib/reports/get-report-cards"
 import { HomeShellClient } from "@/components/home/home-shell-client"
 
 export async function HomeShell() {
-    const reports = await getReports()
-    const mapped = reports.map(mapReportToCard)
+    const reports = await getReportCards()
 
-    const ongoing = mapped.filter((report) => report.status !== "risolta")
-    const resolved = mapped.filter((report) => report.status === "risolta")
+    const ongoing = reports.filter((report) => report.status !== "risolta")
+    const resolved = reports.filter((report) => report.status === "risolta")
 
     return (
         <HomeShellClient

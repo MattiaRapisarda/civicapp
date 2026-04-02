@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import Link from "next/link"
 import L from "leaflet"
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet"
@@ -13,10 +13,18 @@ type ReportsMapProps = {
     zoom?: number
 }
 
-function createCategoryIcon(category: string) {
+const categoryIconCache = new Map<string, L.DivIcon>()
+
+function getCategoryIcon(category: string) {
+    const cachedIcon = categoryIconCache.get(category)
+
+    if (cachedIcon) {
+        return cachedIcon
+    }
+
     const { color } = getCategoryMeta(category)
 
-    return L.divIcon({
+    const icon = L.divIcon({
         className: "",
         html: `
             <div style="
@@ -32,25 +40,38 @@ function createCategoryIcon(category: string) {
         iconAnchor: [9, 9],
         popupAnchor: [0, -10],
     })
+
+    categoryIconCache.set(category, icon)
+
+    return icon
 }
 
 function FitBounds({ reports }: { reports: MapReport[] }) {
     const map = useMap()
 
-    useEffect(() => {
-        if (reports.length === 0) return
+    const coordinatesKey = useMemo(() => {
+        return reports
+            .map((report) => `${report.id}:${report.lat}:${report.lng}`)
+            .join("|")
+    }, [reports])
 
-        if (reports.length === 1) {
-            map.setView([reports[0].lat, reports[0].lng], 16)
+    const positions = useMemo(() => {
+        return reports.map(
+            (report) => [report.lat, report.lng] as [number, number]
+        )
+    }, [coordinatesKey])
+
+    useEffect(() => {
+        if (positions.length === 0) return
+
+        if (positions.length === 1) {
+            map.setView(positions[0], 16)
             return
         }
 
-        const bounds = L.latLngBounds(
-            reports.map((report) => [report.lat, report.lng] as [number, number])
-        )
-
+        const bounds = L.latLngBounds(positions)
         map.fitBounds(bounds, { padding: [40, 40] })
-    }, [map, reports])
+    }, [map, positions])
 
     return null
 }
@@ -95,7 +116,7 @@ export function ReportsMap({
                         <Marker
                             key={report.id}
                             position={[report.lat, report.lng]}
-                            icon={createCategoryIcon(report.category)}
+                            icon={getCategoryIcon(report.category)}
                         >
                             <Popup>
                                 <div className="min-w-55 space-y-2">

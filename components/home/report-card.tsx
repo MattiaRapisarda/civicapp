@@ -1,31 +1,19 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useEffect, useState, useTransition } from "react"
 import { Clock3, Heart } from "lucide-react"
-
+import Image from "next/image"
 import { toggleSupport } from "@/lib/reports/toggle-support"
 import { cn } from "@/lib/utils"
-import { StatusBadge, type ReportStatus } from "@/components/home/status-badge"
-
-export interface Report {
-    id: string
-    title: string
-    location: string
-    status: ReportStatus
-    updatedAtLabel: string
-    supports: number
-    image: string
-    isSupportedByCurrentUser: boolean
-}
+import { StatusBadge } from "@/components/home/status-badge"
+import type { ReportCardItem } from "@/components/home/report-card.types"
 
 interface ReportCardProps {
-    report: Report
+    report: ReportCardItem
 }
 
 export function ReportCard({ report }: ReportCardProps) {
-    const router = useRouter()
     const [isPending, startTransition] = useTransition()
     const [supportError, setSupportError] = useState<string | null>(null)
 
@@ -63,17 +51,15 @@ export function ReportCard({ report }: ReportCardProps) {
                 const result = await toggleSupport(report.id)
 
                 setOptimisticSupported(result.supported)
-                setOptimisticSupports((currentSupports) => {
-                    if (result.supported === previousSupported) {
-                        return previousSupports
-                    }
-
-                    return result.supported
-                        ? previousSupports + 1
-                        : Math.max(0, previousSupports - 1)
-                })
-
-                router.refresh()
+                setOptimisticSupports(
+                    result.supported
+                        ? previousSupported
+                            ? previousSupports
+                            : previousSupports + 1
+                        : previousSupported
+                            ? Math.max(0, previousSupports - 1)
+                            : previousSupports
+                )
             } catch (error) {
                 setOptimisticSupported(previousSupported)
                 setOptimisticSupports(previousSupports)
@@ -93,11 +79,13 @@ export function ReportCard({ report }: ReportCardProps) {
             aria-label={`Apri il dettaglio della segnalazione ${report.title}`}
         >
             <article className="h-full">
-                <div className="relative overflow-hidden rounded-[24px]">
-                    <img
-                        src={report.image}
+                <div className="relative aspect-[1.15/1] overflow-hidden rounded-[24px]">
+                    <Image
+                        src={report.image ?? "/placeholder.jpg"}
                         alt={report.title}
-                        className="aspect-[1.15/1] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                     />
 
                     <div className="absolute left-3 top-3">
@@ -111,7 +99,7 @@ export function ReportCard({ report }: ReportCardProps) {
                         className={cn(
                             "absolute right-3 top-3 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200",
                             optimisticSupported
-                                ? "bg-white/90 scale-110"
+                                ? "scale-110 bg-white/90"
                                 : "bg-black/20 hover:scale-105"
                         )}
                         aria-label={
@@ -124,7 +112,7 @@ export function ReportCard({ report }: ReportCardProps) {
                             className={cn(
                                 "h-5 w-5 transition-all duration-200",
                                 optimisticSupported
-                                    ? "fill-red-500 text-red-500 scale-110"
+                                    ? "scale-110 fill-red-500 text-red-500"
                                     : "text-white"
                             )}
                         />
