@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { supabase } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
+
+const supabase = createClient()
 
 export function PasswordAccountItem() {
     const [isOpen, setIsOpen] = useState(false)
@@ -152,8 +154,8 @@ export function PasswordAccountItem() {
                                 onClick={handleSave}
                                 disabled={!canSave}
                                 className={`rounded-full px-5 py-2 text-sm font-medium transition ${canSave
-                                        ? "bg-foreground text-background hover:opacity-90"
-                                        : "cursor-not-allowed bg-muted text-muted-foreground"
+                                    ? "bg-foreground text-background hover:opacity-90"
+                                    : "cursor-not-allowed bg-muted text-muted-foreground"
                                     }`}
                             >
                                 {isSaving ? "Salvataggio..." : "Salva"}

@@ -3,8 +3,10 @@
 import { useMemo, useState } from "react"
 import { ProfileHeader } from "@/components/profile/profile-header"
 import { AccountSection } from "@/components/profile/account-section"
-import { supabase } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import type { ActivityReport } from "@/components/activity/activity-types"
+
+const supabase = createClient()
 
 type UserProfile = {
     id: string
