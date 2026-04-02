@@ -57,7 +57,7 @@ export function ReportPhotoCard({
                         <input
                             type="file"
                             accept="image/*"
-                            capture="environment"
+                            //capture="environment"
                             className="hidden"
                             onChange={onImageChange}
                         />
