@@ -20,6 +20,8 @@ export async function createReport(
         } = await supabase.auth.getUser()
 
         if (userError || !user) {
+            console.error("AUTH GET USER ERROR:", userError)
+
             return {
                 success: false,
                 error: "Devi essere autenticato per inviare una segnalazione.",
@@ -37,10 +39,34 @@ export async function createReport(
         const lat = Number(latValue)
         const lng = Number(lngValue)
 
-        if (!(image instanceof File)) {
+        if (!image || typeof image === "string") {
             return {
                 success: false,
                 error: "Immagine non valida.",
+            }
+        }
+
+        if (image.size === 0) {
+            return {
+                success: false,
+                error: "Immagine non valida o vuota.",
+            }
+        }
+
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"]
+        const maxSize = 5 * 1024 * 1024
+
+        if (!allowedTypes.includes(image.type)) {
+            return {
+                success: false,
+                error: "Formato immagine non supportato.",
+            }
+        }
+
+        if (image.size > maxSize) {
+            return {
+                success: false,
+                error: "L'immagine deve essere inferiore a 5 MB.",
             }
         }
 
@@ -106,7 +132,13 @@ export async function createReport(
             }
         }
 
-        const fileExt = image.name.split(".").pop()?.toLowerCase() || "jpg"
+        const extensionMap: Record<string, string> = {
+            "image/jpeg": "jpg",
+            "image/png": "png",
+            "image/webp": "webp",
+        }
+
+        const fileExt = extensionMap[image.type] ?? "jpg"
         const filePath = `${user.id}/${createdReport.id}/${randomUUID()}.${fileExt}`
 
         const { error: uploadError } = await supabase.storage
@@ -114,7 +146,7 @@ export async function createReport(
             .upload(filePath, image, {
                 cacheControl: "3600",
                 upsert: false,
-                contentType: image.type || undefined,
+                contentType: image.type,
             })
 
         if (uploadError) {
@@ -124,7 +156,9 @@ export async function createReport(
 
             return {
                 success: false,
-                error: uploadError.message ?? "Upload immagine non riuscito.",
+                error:
+                    uploadError.message ??
+                    "Upload immagine non riuscito.",
             }
         }
 

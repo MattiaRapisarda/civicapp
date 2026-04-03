@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import type { ChangeEvent } from "react"
 import { ChevronRight, MapPin } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -34,30 +35,78 @@ type NominatimResponse = {
 interface ReportLocationCardProps {
     address: string
     selectedCoords: SelectedCoords | null
-    isLocating: boolean
+    isResolvingAddress: boolean
     onAddressChange: (value: string) => void
-    onMapPositionChange: (coords: SelectedCoords) => void
-    onUseCurrentLocation: () => void
+    onAddressResolvingChange: (value: boolean) => void
+    onMapPositionChange: (
+        coords: SelectedCoords,
+        resolvedAddress?: string
+    ) => void
+    onUseCurrentLocationResolved: (
+        coords: SelectedCoords,
+        resolvedAddress?: string
+    ) => void
     onSuggestionSelect: (suggestion: LocationSuggestion) => void
 }
 
 export function ReportLocationCard({
     address,
     selectedCoords,
-    isLocating,
+    isResolvingAddress,
     onAddressChange,
+    onAddressResolvingChange,
     onMapPositionChange,
-    onUseCurrentLocation,
+    onUseCurrentLocationResolved,
     onSuggestionSelect,
 }: ReportLocationCardProps) {
     const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
     const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false)
-    const [isResolvingAddress, setIsResolvingAddress] = useState(false)
+    const [isLocating, setIsLocating] = useState(false)
 
     const normalizedAddress = useMemo(() => address.trim(), [address])
 
+    const skipSuggestionsRef = useRef(false)
+
+    async function fetchSuggestions(query: string, signal?: AbortSignal) {
+        const normalizedQuery = query.trim()
+
+        if (normalizedQuery.length < 3) {
+            setSuggestions([])
+            setIsSuggestionsOpen(false)
+            return []
+        }
+
+        const response = await fetch(
+            `/api/location-suggestions?q=${encodeURIComponent(normalizedQuery)}`,
+            {
+                signal,
+            }
+        )
+
+        if (!response.ok) {
+            setSuggestions([])
+            setIsSuggestionsOpen(false)
+            return []
+        }
+
+        const data = (await response.json()) as {
+            suggestions: LocationSuggestion[]
+        }
+
+        const nextSuggestions = data.suggestions ?? []
+        setSuggestions(nextSuggestions)
+        setIsSuggestionsOpen(nextSuggestions.length > 0)
+
+        return nextSuggestions
+    }
+
     useEffect(() => {
+        if (skipSuggestionsRef.current) {
+            skipSuggestionsRef.current = false
+            return
+        }
+
         if (normalizedAddress.length < 3) {
             setSuggestions([])
             setIsSuggestionsOpen(false)
@@ -69,28 +118,7 @@ export function ReportLocationCard({
         const timeoutId = window.setTimeout(async () => {
             try {
                 setIsLoadingSuggestions(true)
-
-                const response = await fetch(
-                    `/api/location-suggestions?q=${encodeURIComponent(
-                        normalizedAddress
-                    )}`,
-                    {
-                        signal: controller.signal,
-                    }
-                )
-
-                if (!response.ok) {
-                    setSuggestions([])
-                    setIsSuggestionsOpen(false)
-                    return
-                }
-
-                const data = (await response.json()) as {
-                    suggestions: LocationSuggestion[]
-                }
-
-                setSuggestions(data.suggestions ?? [])
-                setIsSuggestionsOpen((data.suggestions?.length ?? 0) > 0)
+                await fetchSuggestions(normalizedAddress, controller.signal)
             } catch (error) {
                 if ((error as Error).name !== "AbortError") {
                     console.error("SUGGESTIONS FETCH ERROR:", error)
@@ -139,28 +167,90 @@ export function ReportLocationCard({
         )
     }
 
-    function handleSelectSuggestion(suggestion: LocationSuggestion) {
-        onSuggestionSelect(suggestion)
-        onAddressChange(suggestion.label)
+    function closeSuggestions() {
         setSuggestions([])
         setIsSuggestionsOpen(false)
+        setIsLoadingSuggestions(false)
+    }
+
+    function handleSelectSuggestion(suggestion: LocationSuggestion) {
+        onSuggestionSelect(suggestion)
+        closeSuggestions()
+    }
+
+    function handleAddressInputChange(event: ChangeEvent<HTMLInputElement>) {
+        skipSuggestionsRef.current = false
+        onAddressChange(event.target.value)
+        setIsSuggestionsOpen(true)
     }
 
     async function handleMapPositionChange(coords: SelectedCoords) {
-        onMapPositionChange(coords)
-
         try {
-            setIsResolvingAddress(true)
+            onAddressResolvingChange(true)
+
             const resolvedAddress = await reverseGeocode(coords.lat, coords.lng)
 
-            if (resolvedAddress) {
-                onAddressChange(resolvedAddress)
-            }
+            skipSuggestionsRef.current = true
+            closeSuggestions()
+            onMapPositionChange(coords, resolvedAddress)
         } catch (error) {
             console.error("REVERSE GEOCODING ERROR:", error)
+            skipSuggestionsRef.current = true
+            closeSuggestions()
+            onMapPositionChange(coords)
         } finally {
-            setIsResolvingAddress(false)
+            onAddressResolvingChange(false)
         }
+    }
+
+    function handleUseCurrentLocation() {
+        if (!navigator.geolocation) {
+            return
+        }
+
+        setIsLocating(true)
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const coords = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                }
+
+                try {
+                    onAddressResolvingChange(true)
+
+                    const resolvedAddress = await reverseGeocode(
+                        coords.lat,
+                        coords.lng
+                    )
+
+                    skipSuggestionsRef.current = true
+                    closeSuggestions()
+                    onUseCurrentLocationResolved(coords, resolvedAddress)
+                } catch (error) {
+                    console.error(
+                        "CURRENT LOCATION REVERSE GEOCODING ERROR:",
+                        error
+                    )
+                    skipSuggestionsRef.current = true
+                    closeSuggestions()
+                    onUseCurrentLocationResolved(coords)
+                } finally {
+                    onAddressResolvingChange(false)
+                    setIsLocating(false)
+                }
+            },
+            () => {
+                onAddressResolvingChange(false)
+                setIsLocating(false)
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0,
+            }
+        )
     }
 
     return (
@@ -173,7 +263,8 @@ export function ReportLocationCard({
                     <div>
                         <h2 className="text-base font-semibold">Posizione</h2>
                         <p className="text-sm text-muted-foreground">
-                            Scrivi un indirizzo oppure tocca la mappa per selezionare il punto esatto
+                            Scrivi un indirizzo oppure tocca la mappa per
+                            selezionare il punto esatto
                         </p>
                     </div>
                 </div>
@@ -190,10 +281,7 @@ export function ReportLocationCard({
                         <input
                             type="text"
                             value={address}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                onAddressChange(e.target.value)
-                                setIsSuggestionsOpen(true)
-                            }}
+                            onChange={handleAddressInputChange}
                             onFocus={() => {
                                 if (suggestions.length > 0) {
                                     setIsSuggestionsOpen(true)
@@ -230,9 +318,9 @@ export function ReportLocationCard({
                     <Button
                         type="button"
                         variant="ghost"
-                        onClick={onUseCurrentLocation}
+                        onClick={handleUseCurrentLocation}
                         className="h-11 w-full cursor-pointer justify-between rounded-2xl border px-4"
-                        disabled={isLocating}
+                        disabled={isLocating || isResolvingAddress}
                     >
                         {isLocating ? "Rilevo posizione..." : "Usa la mia posizione"}
                         <ChevronRight className="h-4 w-4" />
@@ -252,7 +340,9 @@ export function ReportLocationCard({
                         </div>
                     ) : (
                         <div className="rounded-2xl border border-dashed bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
-                            Nessun punto selezionato. Scrivi almeno 3 caratteri, scegli un suggerimento, tocca la mappa oppure usa la tua posizione attuale.
+                            Nessun punto selezionato. Scrivi almeno 3 caratteri,
+                            scegli un suggerimento, tocca la mappa oppure usa la
+                            tua posizione attuale.
                         </div>
                     )}
                 </div>

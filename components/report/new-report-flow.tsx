@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import type { ChangeEvent } from "react"
 import {
     AlertCircle,
@@ -54,9 +54,18 @@ export function NewReportFlow() {
     const [category, setCategory] = useState<ReportCategory | null>(null)
     const [description, setDescription] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [isLocating, setIsLocating] = useState(false)
+    const [isResolvingAddress, setIsResolvingAddress] = useState(false)
+    const [isLocationSynced, setIsLocationSynced] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
+
+    useEffect(() => {
+        return () => {
+            if (imagePreview) {
+                URL.revokeObjectURL(imagePreview)
+            }
+        }
+    }, [imagePreview])
 
     const isValid = useMemo(() => {
         return Boolean(
@@ -65,13 +74,40 @@ export function NewReportFlow() {
             address.trim() &&
             selectedCoords &&
             category &&
-            description.trim()
+            description.trim() &&
+            isLocationSynced &&
+            !isResolvingAddress
         )
-    }, [imageFile, title, address, selectedCoords, category, description])
+    }, [
+        imageFile,
+        title,
+        address,
+        selectedCoords,
+        category,
+        description,
+        isLocationSynced,
+        isResolvingAddress,
+    ])
+
+    function resetMessages() {
+        setErrorMessage(null)
+        setSuccessMessage(null)
+    }
 
     function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0]
         if (!file) return
+
+        if (!file.type.startsWith("image/")) {
+            setErrorMessage("Seleziona un'immagine valida.")
+            return
+        }
+
+        const maxSize = 5 * 1024 * 1024
+        if (file.size > maxSize) {
+            setErrorMessage("L'immagine deve essere inferiore a 5 MB.")
+            return
+        }
 
         if (imagePreview) {
             URL.revokeObjectURL(imagePreview)
@@ -80,8 +116,7 @@ export function NewReportFlow() {
         const previewUrl = URL.createObjectURL(file)
         setImagePreview(previewUrl)
         setImageFile(file)
-        setErrorMessage(null)
-        setSuccessMessage(null)
+        resetMessages()
     }
 
     function handleRemoveImage() {
@@ -91,20 +126,13 @@ export function NewReportFlow() {
 
         setImagePreview(null)
         setImageFile(null)
-        setErrorMessage(null)
-        setSuccessMessage(null)
-    }
-
-    function handleMapPositionChange(coords: SelectedCoords) {
-        setSelectedCoords(coords)
-        setErrorMessage(null)
-        setSuccessMessage(null)
+        resetMessages()
     }
 
     function handleAddressChange(value: string) {
         setAddress(value)
-        setErrorMessage(null)
-        setSuccessMessage(null)
+        setIsLocationSynced(false)
+        resetMessages()
     }
 
     function handleSuggestionSelect(suggestion: LocationSuggestion) {
@@ -113,49 +141,49 @@ export function NewReportFlow() {
             lat: suggestion.lat,
             lng: suggestion.lng,
         })
-        setErrorMessage(null)
-        setSuccessMessage(null)
+        setIsLocationSynced(true)
+        resetMessages()
     }
 
-    function handleUseCurrentLocation() {
-        if (!navigator.geolocation) {
-            setErrorMessage("La geolocalizzazione non è supportata dal browser.")
-            return
+    function handleMapPositionChange(
+        coords: SelectedCoords,
+        resolvedAddress?: string
+    ) {
+        setSelectedCoords(coords)
+
+        if (resolvedAddress?.trim()) {
+            setAddress(resolvedAddress.trim())
+            setIsLocationSynced(true)
+        } else {
+            setIsLocationSynced(false)
         }
 
-        setIsLocating(true)
-        setErrorMessage(null)
-        setSuccessMessage(null)
+        resetMessages()
+    }
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setSelectedCoords({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                })
-                setIsLocating(false)
-            },
-            () => {
-                setIsLocating(false)
-                setErrorMessage(
-                    "Non è stato possibile rilevare la tua posizione."
-                )
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0,
-            }
-        )
+    function handleUseCurrentLocationResolved(
+        coords: SelectedCoords,
+        resolvedAddress?: string
+    ) {
+        setSelectedCoords(coords)
+
+        if (resolvedAddress?.trim()) {
+            setAddress(resolvedAddress.trim())
+            setIsLocationSynced(true)
+        } else {
+            setIsLocationSynced(false)
+        }
+
+        resetMessages()
     }
 
     async function handleSubmit() {
+        if (isSubmitting) return
         if (!isValid || !imageFile || !category || !selectedCoords) return
 
         try {
             setIsSubmitting(true)
-            setErrorMessage(null)
-            setSuccessMessage(null)
+            resetMessages()
 
             const formData = new FormData()
             formData.append("image", imageFile)
@@ -169,7 +197,7 @@ export function NewReportFlow() {
             const result = await createReport(formData)
 
             if (!result.success) {
-                setErrorMessage(result.error)
+                setErrorMessage(result.error || "Invio non riuscito.")
                 return
             }
 
@@ -184,9 +212,11 @@ export function NewReportFlow() {
             setSelectedCoords(null)
             setCategory(null)
             setDescription("")
+            setIsLocationSynced(false)
+
             setSuccessMessage("Segnalazione inviata con successo.")
         } catch (error) {
-            console.error(error)
+            console.error("Errore invio segnalazione:", error)
             setErrorMessage("Si è verificato un errore imprevisto.")
         } finally {
             setIsSubmitting(false)
@@ -212,10 +242,11 @@ export function NewReportFlow() {
                 <ReportLocationCard
                     address={address}
                     selectedCoords={selectedCoords}
-                    isLocating={isLocating}
+                    isResolvingAddress={isResolvingAddress}
                     onAddressChange={handleAddressChange}
+                    onAddressResolvingChange={setIsResolvingAddress}
                     onMapPositionChange={handleMapPositionChange}
-                    onUseCurrentLocation={handleUseCurrentLocation}
+                    onUseCurrentLocationResolved={handleUseCurrentLocationResolved}
                     onSuggestionSelect={handleSuggestionSelect}
                 />
 
@@ -232,6 +263,13 @@ export function NewReportFlow() {
                     onDescriptionChange={setDescription}
                     maxLength={240}
                 />
+
+                {!isLocationSynced && address.trim() ? (
+                    <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                        Conferma un indirizzo valido o seleziona un punto corretto
+                        sulla mappa.
+                    </div>
+                ) : null}
 
                 {errorMessage ? (
                     <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
