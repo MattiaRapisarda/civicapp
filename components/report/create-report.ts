@@ -1,6 +1,5 @@
 "use server"
 
-import { randomUUID } from "crypto"
 import { revalidatePath } from "next/cache"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 
@@ -12,12 +11,20 @@ export async function createReport(
     formData: FormData
 ): Promise<CreateReportResult> {
     try {
+        console.log("[CREATE_REPORT] start")
+
         const supabase = await createSupabaseServerClient()
+        console.log("[CREATE_REPORT] supabase client ok")
 
         const {
             data: { user },
             error: userError,
         } = await supabase.auth.getUser()
+
+        console.log("[CREATE_REPORT] auth checked", {
+            hasUser: Boolean(user),
+            userError: userError?.message ?? null,
+        })
 
         if (userError || !user) {
             console.error("AUTH GET USER ERROR:", userError)
@@ -53,6 +60,14 @@ export async function createReport(
             }
         }
 
+        const mimeType = image.type?.trim().toLowerCase() || ""
+
+        console.log("[CREATE_REPORT] image info", {
+            name: "name" in image ? image.name : null,
+            type: mimeType,
+            size: image.size,
+        })
+
         const allowedTypes = [
             "image/jpeg",
             "image/png",
@@ -61,9 +76,9 @@ export async function createReport(
             "image/heif",
         ]
 
-        const maxSize = 50 * 1024 * 1024
+        const maxSize = 10 * 1024 * 1024
 
-        if (!allowedTypes.includes(image.type)) {
+        if (!allowedTypes.includes(mimeType)) {
             return {
                 success: false,
                 error:
@@ -129,6 +144,11 @@ export async function createReport(
             .select("id")
             .single()
 
+        console.log("[CREATE_REPORT] report insert", {
+            reportId: createdReport?.id ?? null,
+            error: reportInsertError?.message ?? null,
+        })
+
         if (reportInsertError || !createdReport) {
             console.error("REPORT INSERT ERROR:", reportInsertError)
 
@@ -148,16 +168,22 @@ export async function createReport(
             "image/heif": "heif",
         }
 
-        const fileExt = extensionMap[image.type] ?? "jpg"
-        const filePath = `${user.id}/${createdReport.id}/${randomUUID()}.${fileExt}`
+        const fileExt = extensionMap[mimeType] ?? "jpg"
+        const filePath = `${user.id}/${createdReport.id}/${crypto.randomUUID()}.${fileExt}`
+
+        console.log("[CREATE_REPORT] upload start", { filePath, mimeType })
 
         const { error: uploadError } = await supabase.storage
             .from("report-images")
             .upload(filePath, image, {
                 cacheControl: "3600",
                 upsert: false,
-                contentType: image.type,
+                contentType: mimeType,
             })
+
+        console.log("[CREATE_REPORT] upload result", {
+            error: uploadError?.message ?? null,
+        })
 
         if (uploadError) {
             console.error("STORAGE UPLOAD ERROR:", uploadError)
@@ -182,6 +208,10 @@ export async function createReport(
                 is_cover: true,
             })
 
+        console.log("[CREATE_REPORT] image insert", {
+            error: imageInsertError?.message ?? null,
+        })
+
         if (imageInsertError) {
             console.error("REPORT IMAGE INSERT ERROR:", imageInsertError)
 
@@ -201,6 +231,8 @@ export async function createReport(
         revalidatePath("/activity")
         revalidatePath("/report")
         revalidatePath("/profile")
+
+        console.log("[CREATE_REPORT] success", { reportId: createdReport.id })
 
         return {
             success: true,
