@@ -123,7 +123,7 @@ export function ReportAbuseDialog({
                     {abuseError ? (
                         <p className="text-sm text-destructive">{abuseError}</p>
                     ) : abuseSuccess ? (
-                        <p className="text-sm text-emerald-600">{abuseSuccess}</p>
+                        <p className="text-sm text-success">{abuseSuccess}</p>
                     ) : (
                         <p className="text-xs text-muted-foreground">
                             La tua segnalazione verrà registrata e verificata.
@@ -135,7 +135,7 @@ export function ReportAbuseDialog({
                     <Button
                         type="button"
                         variant="outline"
-                        className="rounded-full"
+                        className="rounded-full cursor-pointer"
                         onClick={() => onOpenChange(false)}
                     >
                         Annulla
@@ -143,7 +143,7 @@ export function ReportAbuseDialog({
 
                     <Button
                         type="button"
-                        className="rounded-full"
+                        className="rounded-full cursor-pointer"
                         onClick={onSubmit}
                         disabled={isPending || !abuseReason}
                     >

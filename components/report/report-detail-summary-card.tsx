@@ -97,8 +97,8 @@ export function ReportDetailSummaryCard({
                             onClick={onToggleSupport}
                             disabled={isSupportPending}
                             className={cn(
-                                "h-12 w-full cursor-pointer rounded-full text-sm font-medium",
-                                isSupported && "bg-foreground text-background hover:bg-foreground/90"
+                                "h-12 w-full cursor-pointer hover:bg-success rounded-full text-sm font-medium",
+                                isSupported && "bg-success text-background hover:bg-foreground/90"
                             )}
                         >
                             <Heart

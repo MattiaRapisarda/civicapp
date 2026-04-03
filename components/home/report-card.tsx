@@ -1,9 +1,10 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useEffect, useState, useTransition } from "react"
 import { Clock3, Heart } from "lucide-react"
-import Image from "next/image"
+
 import { toggleSupport } from "@/lib/reports/toggle-support"
 import { cn } from "@/lib/utils"
 import { StatusBadge } from "@/components/home/status-badge"
@@ -78,8 +79,8 @@ export function ReportCard({ report }: ReportCardProps) {
             className="group block h-full"
             aria-label={`Apri il dettaglio della segnalazione ${report.title}`}
         >
-            <article className="h-full">
-                <div className="relative aspect-[1.15/1] overflow-hidden rounded-[24px]">
+            <article className="surface-card h-full overflow-hidden">
+                <div className="relative aspect-[1.25/1] overflow-hidden">
                     <Image
                         src={report.image ?? "/placeholder.jpg"}
                         alt={report.title}
@@ -97,50 +98,44 @@ export function ReportCard({ report }: ReportCardProps) {
                         onClick={handleToggleSupport}
                         disabled={isPending}
                         className={cn(
-                            "absolute right-3 top-3 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200",
+                            "absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200 disabled:pointer-events-none disabled:opacity-70",
                             optimisticSupported
-                                ? "scale-110 bg-white/90"
-                                : "bg-black/20 hover:scale-105"
+                                ? "scale-110 bg-secondary/90 text-success shadow-sm"
+                                : "bg-secondary/20 text-secondary hover:scale-105"
                         )}
                         aria-label={
-                            optimisticSupported
-                                ? "Rimuovi supporto"
-                                : "Aggiungi supporto"
+                            optimisticSupported ? "Rimuovi supporto" : "Aggiungi supporto"
                         }
                     >
                         <Heart
                             className={cn(
                                 "h-5 w-5 transition-all duration-200",
-                                optimisticSupported
-                                    ? "scale-110 fill-red-500 text-red-500"
-                                    : "text-white"
+                                optimisticSupported ? "scale-110 fill-current" : ""
                             )}
                         />
                     </button>
                 </div>
 
-                <div className="flex min-h-24 flex-col px-1 pb-1 pt-3">
-                    <h3 className="line-clamp-2 text-[1.15rem] font-semibold leading-[1.15] tracking-[-0.02em] text-foreground sm:text-[1.25rem]">
+                <div className="flex min-h-28 flex-col p-4 sm:p-5">
+                    <h3 className="line-clamp-2 text-base font-semibold leading-tight tracking-tight sm:text-lg">
                         {report.title}
                     </h3>
 
-                    <p className="mt-1 line-clamp-1 text-sm text-foreground/90 sm:text-[15px]">
+                    <p className="mt-1 line-clamp-1 text-sm text-foreground/85">
                         {report.location}
                     </p>
 
-                    <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
                         <Clock3 className="h-3.5 w-3.5 shrink-0" />
                         <span>{report.updatedAtLabel}</span>
                     </div>
 
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="mt-2 text-sm text-muted-foreground">
                         {optimisticSupports} supporti · stato pubblico
                     </p>
 
                     {supportError ? (
-                        <p className="mt-1 text-xs text-destructive">
-                            {supportError}
-                        </p>
+                        <p className="mt-2 text-xs text-destructive">{supportError}</p>
                     ) : null}
                 </div>
             </article>

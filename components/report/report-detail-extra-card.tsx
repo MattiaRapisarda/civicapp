@@ -74,7 +74,7 @@ export function ReportDetailExtraCard({
                         disabled={isSupportPending}
                         className={cn(
                             "h-12 w-full cursor-pointer rounded-full text-sm font-medium",
-                            isSupported && "bg-foreground text-background hover:bg-foreground/90"
+                            isSupported && "bg-success text-background hover:bg-foreground/90"
                         )}
                     >
                         <Heart className={cn("mr-2 h-4 w-4", isSupported && "fill-current")} />

@@ -38,7 +38,7 @@ export function ReportDetailUpdatesCard({
                                             getUpdateIconClasses(update.type)
                                         )}
                                     >
-                                        <Icon className="h-5 w-5" />
+                                        <Icon className="h-5 w-5 text-info" />
                                     </div>
 
                                     {index < updates.length - 1 ? (

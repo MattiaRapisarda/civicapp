@@ -22,7 +22,7 @@ function getStatusLabel(status: ReportStatus): string {
 export function StatusBadge({ status }: StatusBadgeProps) {
     if (status === "risolta") {
         return (
-            <Badge className="rounded-full bg-green-600 hover:bg-green-600">
+            <Badge className="rounded-full bg-success hover:bg-success">
                 {getStatusLabel(status)}
             </Badge>
         )

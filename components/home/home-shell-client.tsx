@@ -52,33 +52,39 @@ export function HomeShellClient({
         filteredResolvedReports.length === 0
 
     return (
-        <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-2 sm:px-6 lg:px-8">
-            <SearchBar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                onSearch={setSearchQuery}
-                onFilterChange={setSelectedFilter}
-            />
-
-            {hasNoResults ? (
-                <div className="mt-6 rounded-[24px] border bg-card p-6 text-sm text-muted-foreground shadow-sm">
-                    Nessuna segnalazione trovata.
-                </div>
-            ) : null}
-
-            {(selectedFilter === null || selectedFilter === "in_corso") && (
-                <ReportSection
-                    title="Segnalazioni in corso"
-                    reports={filteredOngoingReports}
+        <main className="app-shell">
+            <div className="section-stack">
+                <SearchBar
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    onSearch={setSearchQuery}
+                    onFilterChange={setSelectedFilter}
                 />
-            )}
 
-            {(selectedFilter === null || selectedFilter === "concluse") && (
-                <ReportSection
-                    title="Segnalazioni concluse"
-                    reports={filteredResolvedReports}
-                />
-            )}
+                {hasNoResults ? (
+                    <div className="surface-card p-6">
+                        <h2 className="text-base font-semibold">Nessun risultato</h2>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                            Prova a modificare la ricerca o il filtro per trovare altre
+                            segnalazioni.
+                        </p>
+                    </div>
+                ) : null}
+
+                {(selectedFilter === null || selectedFilter === "in_corso") && (
+                    <ReportSection
+                        title="Segnalazioni in corso"
+                        reports={filteredOngoingReports}
+                    />
+                )}
+
+                {(selectedFilter === null || selectedFilter === "concluse") && (
+                    <ReportSection
+                        title="Segnalazioni concluse"
+                        reports={filteredResolvedReports}
+                    />
+                )}
+            </div>
         </main>
     )
 }

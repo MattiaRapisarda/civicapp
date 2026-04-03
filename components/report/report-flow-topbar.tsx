@@ -8,7 +8,7 @@ export function ReportFlowTopbar() {
     const router = useRouter()
 
     return (
-        <div className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
+        <div className="sticky top-0 z-1000 border-b bg-background/95 backdrop-blur">
             <div className="mx-auto flex h-16 w-full items-center justify-between">
                 <Button
                     type="button"
