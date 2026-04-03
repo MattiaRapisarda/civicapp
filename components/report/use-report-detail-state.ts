@@ -46,6 +46,14 @@ export function useReportDetailState(report: ReportDetail) {
             try {
                 const result = await toggleSupport(report.id)
 
+                if (!result.success) {
+                    setOptimisticSupported(previousSupported)
+                    setOptimisticSupports(previousSupports)
+                    setSupportError(result.error)
+                    return
+                }
+
+                setSupportError(null)
                 setOptimisticSupported(result.supported)
                 setOptimisticSupports(
                     result.supported
@@ -56,13 +64,12 @@ export function useReportDetailState(report: ReportDetail) {
                             ? Math.max(0, previousSupports - 1)
                             : previousSupports
                 )
-            } catch (error) {
+            } catch {
+                // fallback per errori davvero imprevisti
                 setOptimisticSupported(previousSupported)
                 setOptimisticSupports(previousSupports)
                 setSupportError(
-                    error instanceof Error
-                        ? error.message
-                        : "Non è stato possibile aggiornare il supporto."
+                    "Non è stato possibile aggiornare il supporto."
                 )
             }
         })
