@@ -51,6 +51,14 @@ export function ReportCard({ report }: ReportCardProps) {
             try {
                 const result = await toggleSupport(report.id)
 
+                if (!result.success) {
+                    setOptimisticSupported(previousSupported)
+                    setOptimisticSupports(previousSupports)
+                    setSupportError(result.error)
+                    return
+                }
+
+                setSupportError(null)
                 setOptimisticSupported(result.supported)
                 setOptimisticSupports(
                     result.supported
@@ -61,13 +69,11 @@ export function ReportCard({ report }: ReportCardProps) {
                             ? Math.max(0, previousSupports - 1)
                             : previousSupports
                 )
-            } catch (error) {
+            } catch {
                 setOptimisticSupported(previousSupported)
                 setOptimisticSupports(previousSupports)
                 setSupportError(
-                    error instanceof Error
-                        ? error.message
-                        : "Non è stato possibile aggiornare il supporto."
+                    "Non è stato possibile aggiornare il supporto."
                 )
             }
         })
@@ -104,7 +110,9 @@ export function ReportCard({ report }: ReportCardProps) {
                                 : "bg-secondary/20 text-secondary hover:scale-105"
                         )}
                         aria-label={
-                            optimisticSupported ? "Rimuovi supporto" : "Aggiungi supporto"
+                            optimisticSupported
+                                ? "Rimuovi supporto"
+                                : "Aggiungi supporto"
                         }
                     >
                         <Heart
