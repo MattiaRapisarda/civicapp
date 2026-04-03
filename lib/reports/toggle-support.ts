@@ -22,7 +22,7 @@ export async function toggleSupport(
 
     if (userError || !user) {
         console.error("TOGGLE SUPPORT - userError:", userError)
-        throw new Error("Utente non autenticato")
+        throw new Error("Devi effettuare l'accesso per continuare")
     }
 
     if (!reportId) {
