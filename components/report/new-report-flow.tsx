@@ -217,7 +217,12 @@ export function NewReportFlow() {
             setSuccessMessage("Segnalazione inviata con successo.")
         } catch (error) {
             console.error("Errore invio segnalazione:", error)
-            setErrorMessage("Si è verificato un errore imprevisto.")
+
+            if (error instanceof Error) {
+                setErrorMessage(error.message || "Si è verificato un errore imprevisto.")
+            } else {
+                setErrorMessage("Si è verificato un errore imprevisto.")
+            }
         } finally {
             setIsSubmitting(false)
         }
