@@ -16,7 +16,7 @@ export function BottomNav() {
     const pathname = usePathname()
 
     return (
-        <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
             <div className="mx-auto flex max-w-5xl items-center gap-1 px-3 py-2 sm:px-4">
                 {tabs.map((tab) => {
                     const Icon = tab.icon

@@ -80,7 +80,7 @@ export function ReportCard({ report }: ReportCardProps) {
             aria-label={`Apri il dettaglio della segnalazione ${report.title}`}
         >
             <article className="surface-card h-full overflow-hidden">
-                <div className="relative aspect-[1.25/1] overflow-hidden">
+                <div className="relative aspect-1.25/1 overflow-hidden">
                     <Image
                         src={report.image ?? "/placeholder.jpg"}
                         alt={report.title}
