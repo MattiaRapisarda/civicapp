@@ -15,19 +15,19 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
     const message = params?.message
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-background px-4">
-            <div className="w-full max-w-md rounded-[28px] border bg-card p-6 shadow-sm">
-                <div className="mb-6 space-y-2 text-center">
-                    <h1 className="text-2xl font-semibold">Crea account</h1>
-                    <p className="text-sm text-muted-foreground">
+        <main className="auth-shell">
+            <div className="auth-card">
+                <div className="auth-header">
+                    <h1 className="auth-title">Crea account</h1>
+                    <p className="auth-description">
                         Registrati per partecipare attivamente alla tua città
                     </p>
                 </div>
 
-                <form action={signup} className="space-y-4">
+                <form action={signup} className="form-stack">
                     <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="space-y-2">
-                            <label htmlFor="firstName" className="text-sm font-medium">
+                        <div className="field-stack">
+                            <label htmlFor="firstName" className="field-label">
                                 Nome
                             </label>
                             <input
@@ -36,13 +36,13 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                                 type="text"
                                 required
                                 autoComplete="given-name"
-                                className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition-colors focus:border-foreground/20"
                                 placeholder="Mario"
+                                className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition focus:border-ring"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label htmlFor="lastName" className="text-sm font-medium">
+                        <div className="field-stack">
+                            <label htmlFor="lastName" className="field-label">
                                 Cognome
                             </label>
                             <input
@@ -51,14 +51,14 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                                 type="text"
                                 required
                                 autoComplete="family-name"
-                                className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition-colors focus:border-foreground/20"
                                 placeholder="Rossi"
+                                className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition focus:border-ring"
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="email" className="text-sm font-medium">
+                    <div className="field-stack">
+                        <label htmlFor="email" className="field-label">
                             Email
                         </label>
                         <input
@@ -67,13 +67,13 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                             type="email"
                             required
                             autoComplete="email"
-                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition-colors focus:border-foreground/20"
                             placeholder="tuoindirizzo@email.com"
+                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition focus:border-ring"
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="password" className="text-sm font-medium">
+                    <div className="field-stack">
+                        <label htmlFor="password" className="field-label">
                             Password
                         </label>
                         <input
@@ -83,12 +83,15 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                             required
                             minLength={8}
                             autoComplete="new-password"
-                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition-colors focus:border-foreground/20"
                             placeholder="Almeno 8 caratteri"
+                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition focus:border-ring"
                         />
                     </div>
 
-                    <div className="rounded-2xl border bg-background/60 p-4">
+                    <div
+                        className="rounded-2xl border p-4"
+                        style={{ backgroundColor: "color-mix(in oklab, var(--surface-1) 88%, transparent)" }}
+                    >
                         <div className="flex items-start gap-3">
                             <input
                                 id="acceptTerms"
@@ -106,7 +109,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                                 Accetto la{" "}
                                 <Link
                                     href="/privacy.pdf"
-                                    className="font-medium text-foreground underline underline-offset-4"
+                                    className="font-medium text-foreground underline underline-offset-4 transition hover:opacity-80"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
@@ -115,7 +118,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                                 e i{" "}
                                 <Link
                                     href="/termini.pdf"
-                                    className="font-medium text-foreground underline underline-offset-4"
+                                    className="font-medium text-foreground underline underline-offset-4 transition hover:opacity-80"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
@@ -126,15 +129,14 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                         </div>
                     </div>
 
-                    {message ? (
-                        <p className="text-sm text-emerald-600">{message}</p>
-                    ) : null}
+                    {message ? <p className="feedback-success">{message}</p> : null}
 
-                    {error ? (
-                        <p className="text-sm text-destructive">{error}</p>
-                    ) : null}
+                    {error ? <p className="feedback-error">{error}</p> : null}
 
-                    <Button type="submit" className="h-12 w-full cursor-pointer rounded-full">
+                    <Button
+                        type="submit"
+                        className="w-full h-12 cursor-pointer hover:bg-success"
+                    >
                         Registrati
                     </Button>
                 </form>
@@ -143,7 +145,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
                     Hai già un account?{" "}
                     <Link
                         href="/login"
-                        className="cursor-pointer font-medium text-foreground underline underline-offset-4"
+                        className="font-medium text-foreground underline underline-offset-4 transition hover:opacity-80"
                     >
                         Accedi
                     </Link>

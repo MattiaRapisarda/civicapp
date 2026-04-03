@@ -15,18 +15,18 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     const message = params?.message
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-background px-4">
-            <div className="w-full max-w-md rounded-[28px] border bg-card p-6 shadow-sm">
-                <div className="mb-6 space-y-2 text-center">
-                    <h1 className="text-2xl font-semibold">Accedi</h1>
-                    <p className="text-sm text-muted-foreground">
+        <main className="auth-shell">
+            <div className="auth-card">
+                <div className="auth-header">
+                    <h1 className="auth-title">Accedi</h1>
+                    <p className="auth-description">
                         Entra in CivicApp per supportare e commentare le segnalazioni
                     </p>
                 </div>
 
-                <form action={login} className="space-y-4">
-                    <div className="space-y-2">
-                        <label htmlFor="email" className="text-sm font-medium">
+                <form action={login} className="form-stack">
+                    <div className="field-stack">
+                        <label htmlFor="email" className="field-label">
                             Email
                         </label>
                         <input
@@ -34,13 +34,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                             name="email"
                             type="email"
                             required
-                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
                             placeholder="tuoindirizzo@email.com"
+                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition focus:border-ring"
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="password" className="text-sm font-medium">
+                    <div className="field-stack">
+                        <label htmlFor="password" className="field-label">
                             Password
                         </label>
                         <input
@@ -48,27 +48,33 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                             name="password"
                             type="password"
                             required
-                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none focus:border-foreground/20"
                             placeholder="••••••••"
+                            className="h-12 w-full rounded-2xl border bg-background px-4 text-sm outline-none transition focus:border-ring"
                         />
                     </div>
 
                     {message ? (
-                        <p className="text-sm text-emerald-600">{message}</p>
+                        <p className="feedback-success">{message}</p>
                     ) : null}
 
                     {error ? (
-                        <p className="text-sm text-destructive">{error}</p>
+                        <p className="feedback-error">{error}</p>
                     ) : null}
 
-                    <Button type="submit" className="h-12 w-full rounded-full cursor-pointer">
+                    <Button
+                        type="submit"
+                        className="w-full h-12 cursor-pointer hover:bg-success"
+                    >
                         Accedi
                     </Button>
                 </form>
 
                 <p className="mt-5 text-center text-sm text-muted-foreground">
                     Non hai un account?{" "}
-                    <Link href="/signup" className="font-medium text-foreground underline cursor-pointer">
+                    <Link
+                        href="/signup"
+                        className="font-medium text-foreground underline transition hover:opacity-80"
+                    >
                         Registrati
                     </Link>
                 </p>
