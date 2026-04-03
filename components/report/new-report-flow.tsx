@@ -103,9 +103,9 @@ export function NewReportFlow() {
             return
         }
 
-        const maxSize = 5 * 1024 * 1024
+        const maxSize = 50 * 1024 * 1024
         if (file.size > maxSize) {
-            setErrorMessage("L'immagine deve essere inferiore a 5 MB.")
+            setErrorMessage("L'immagine deve essere inferiore a 25 MB.")
             return
         }
 
