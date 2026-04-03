@@ -53,20 +53,28 @@ export async function createReport(
             }
         }
 
-        const allowedTypes = ["image/jpeg", "image/png", "image/webp"]
-        const maxSize = 5 * 1024 * 1024
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/heic",
+            "image/heif",
+        ]
+
+        const maxSize = 50 * 1024 * 1024
 
         if (!allowedTypes.includes(image.type)) {
             return {
                 success: false,
-                error: "Formato immagine non supportato.",
+                error:
+                    "Formato immagine non supportato. Usa JPG, PNG, WEBP o HEIC.",
             }
         }
 
         if (image.size > maxSize) {
             return {
                 success: false,
-                error: "L'immagine deve essere inferiore a 5 MB.",
+                error: "L'immagine deve essere inferiore a 10 MB.",
             }
         }
 
@@ -136,6 +144,8 @@ export async function createReport(
             "image/jpeg": "jpg",
             "image/png": "png",
             "image/webp": "webp",
+            "image/heic": "heic",
+            "image/heif": "heif",
         }
 
         const fileExt = extensionMap[image.type] ?? "jpg"
@@ -156,9 +166,7 @@ export async function createReport(
 
             return {
                 success: false,
-                error:
-                    uploadError.message ??
-                    "Upload immagine non riuscito.",
+                error: uploadError.message ?? "Upload immagine non riuscito.",
             }
         }
 
